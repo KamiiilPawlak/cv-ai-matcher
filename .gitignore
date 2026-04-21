@@ -1,0 +1,9 @@
+__pycache__/
+*cv_ai_matcher.egg-info
+*.pyc
+.pytest_cache
+.ruff_cache
+.env
+.venv/
+dist/
+build/
