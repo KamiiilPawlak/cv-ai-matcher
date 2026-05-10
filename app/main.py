@@ -12,4 +12,4 @@ app.include_router(health.router, prefix="/api/v1", tags=["system"])
 
 @app.get("/")
 def root() -> Dict[str, str]:
-    return {"message": "Witamy w CV AI Matcher API"}
+    return {"message": "docker :D"}
