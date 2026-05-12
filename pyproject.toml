@@ -8,9 +8,17 @@ dependencies = [
     "fastapi",
     "uvicorn",
     "pydantic",
+    "pydantic-settings",
     "python-dotenv",
-    "pdfplumber"
-    ]
+    "python-multipart",
+    "aiofiles",
+    "pdfplumber",
+    "pymupdf",
+    "pytesseract",
+    "pillow",
+    "python-magic-bin; sys_platform == 'win32'",
+    "python-magic; sys_platform != 'win32'"
+]
 
 [project.optional-dependencies]
 dev = [
@@ -45,6 +53,10 @@ strict = true
 ignore_missing_imports = true
 warn_return_any = true
 warn_unused_configs = true
+
+[[tool.mypy.overrides]]
+module = ["magic"]
+ignore_missing_imports = true
 
 
 [tool.pytest.ini_options]
