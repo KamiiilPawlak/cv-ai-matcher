@@ -5,7 +5,7 @@ from app.core.config import settings
 
 
 def verify_file_integrity(content: bytes) -> str:
-    mime_type = magic.from_buffer(content[:2024], mime=True)
+    mime_type = str(magic.from_buffer(content[:2024], mime=True))
 
     if mime_type not in settings.ALLOWED_MINE_TYPES:
         raise HTTPException(
