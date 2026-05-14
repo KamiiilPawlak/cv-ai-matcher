@@ -1,10 +1,21 @@
-from typing import Dict
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator, Dict
 
 from fastapi import FastAPI
 
 from app.api.v1.routes import health, ingestion
+from app.core.database import init_db
 
-app = FastAPI(title="CV AI Matcher")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    print("Uruchomienie aplikacji..")
+    init_db()
+    yield
+    print("Zamykanie aplikacji..")
+
+
+app = FastAPI(title="CV AI Matcher", lifespan=lifespan)
 
 
 app.include_router(health.router, prefix="/api/v1", tags=["system"])
