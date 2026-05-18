@@ -1,7 +1,7 @@
 import io
 
 import pdfplumber
-import pytesseract
+import pytesseract  # type: ignore
 from pdf2image import convert_from_bytes
 from PIL import Image, ImageFilter, ImageOps
 

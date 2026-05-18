@@ -1,4 +1,4 @@
-import magic
+import magic  # type: ignore
 from fastapi import HTTPException, status
 
 from app.core.config import settings

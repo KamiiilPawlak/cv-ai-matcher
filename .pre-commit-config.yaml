@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -8,11 +8,21 @@ repos:
       - id: check-added-large-files
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.0
+    rev: v0.5.0
     hooks:
       - id: ruff
-        args: [--fix]
+        args: [--fix, --config=backend/pyproject.toml]
       - id: ruff-format
+        args: [--config=backend/pyproject.toml]
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: bash -c "cd backend && mypy ."
+        language: system
+        types: [python]
+        pass_filenames: false
 
   - repo: local
     hooks:

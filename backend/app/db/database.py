@@ -1,9 +1,9 @@
 from typing import Generator
 
-from models.cv import RawCV, RawJobOfferts
 from sqlmodel import Session, SQLModel, create_engine
 
 from ..core.config import settings
+from ..models.cv import RawCV, RawJobOfferts
 
 engine = create_engine(settings.DATABASE_URL, echo=True)
 
