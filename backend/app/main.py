@@ -4,13 +4,14 @@ from typing import AsyncGenerator, Dict
 from fastapi import FastAPI
 
 from app.api.v1.routes import health, ingestion
-from app.core.database import init_db
+
+# from .db.database import init_db
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     print("Uruchomienie aplikacji..")
-    init_db()
+    # init_db()
     yield
     print("Zamykanie aplikacji..")
 

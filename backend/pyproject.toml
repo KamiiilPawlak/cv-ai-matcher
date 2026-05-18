@@ -17,7 +17,11 @@ dependencies = [
     "pytesseract",
     "pillow",
     "python-magic-bin; sys_platform == 'win32'",
-    "python-magic; sys_platform != 'win32'"
+    "python-magic; sys_platform != 'win32'",
+    "sqlmodel>=0.0.22",
+    "asyncpg",
+    "pdf2image",
+    "psycopg2-binary"
 ]
 
 [project.optional-dependencies]
@@ -25,7 +29,8 @@ dev = [
     "ruff",
     "black",
     "mypy",
-    "pytest"
+    "pytest",
+    "alembic"
 ]
 
 
@@ -55,7 +60,7 @@ warn_return_any = true
 warn_unused_configs = true
 
 [[tool.mypy.overrides]]
-module = ["magic"]
+module = ["magic", "pytesseract"]
 ignore_missing_imports = true
 
 
