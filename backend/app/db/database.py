@@ -3,13 +3,13 @@ from typing import Generator
 from sqlmodel import Session, SQLModel, create_engine
 
 from ..core.config import settings
-from ..models.cv import RawCV, RawJobOfferts
+from ..models.cv import RawCV, RawJobOffers
 
 engine = create_engine(settings.DATABASE_URL, echo=True)
 
 
 def init_db() -> None:
-    _ = [RawCV, RawJobOfferts]
+    _ = [RawCV, RawJobOffers]
     SQLModel.metadata.create_all(engine)
 
 
