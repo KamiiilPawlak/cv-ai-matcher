@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,7 +15,7 @@ class Settings(BaseSettings):
 
     OCR_LANGAGUES: str = "pol+eng"
 
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/cv_matcher"
+    DATABASE_URL: str = Field(default=...)
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"

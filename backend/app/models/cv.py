@@ -13,16 +13,16 @@ class RawCV(SQLModel, table=True):
     )
     filename: str
     raw_text: str
-    uploaded_at: datetime = Field(default_factory=datetime.utcnow)
+    uploaded_at: datetime = Field(default_factory=datetime.now)
 
 
-class RawJobOfferts(SQLModel, table=True):
+class RawJobOffers(SQLModel, table=True):
     """raw data"""
 
     id: uuid.UUID = Field(
         default_factory=uuid.uuid4, primary_key=True, index=True, nullable=False
     )
     title: str
-    descritpion: str
+    description: str
     source: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.now)
