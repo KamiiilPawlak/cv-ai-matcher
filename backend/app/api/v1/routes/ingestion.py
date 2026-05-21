@@ -1,38 +1,24 @@
 from typing import Any, Dict
 
+from backend.app.models.ingestion_dto import IngestionResponse
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
-from app.core.config import settings
-from app.core.security import verify_file_integrity
-from app.services.file_service import save_upload_file
-from app.services.ocr_service import OCRService
+from app.services.ingestion_service import IngestionService
 
 router = APIRouter()
 
 
-@router.post("/upload")
+@router.post("/upload", response_model=IngestionResponse)
 async def process_cv_upload(file: UploadFile = File(...)) -> Dict[str, Any]:
-    content = await file.read()
-
     if file.filename is None:
         raise HTTPException(status_code=400, detail="Nazwa pliku jest wymagana")
 
-    if len(content) > settings.MAX_FILE_SIZE:
-        raise HTTPException(status_code=413, detail="Plik jest za duzy")
-
-    mime_type = verify_file_integrity(content)
+    content = await file.read()
 
     try:
-        extracted_text = await OCRService.process_document(content, mime_type)
-    except Exception as e:
-        extracted_text = f"Blad podczas ektrakcji tekstu: {str(e)}"
-
-    file_id = await save_upload_file(content, file.filename)
-
-    return {
-        "message": "Wlot zakonczony sukcesem",
-        "file_id": file_id,
-        "mimie_type": mime_type,
-        "original_name": file.filename,
-        "extracted_content": extracted_text.strip() if extracted_text else "",
-    }
+        # Całą brudną robotę zlecasz serwisowi w jednej linijce:
+        result = await IngestionService.process_cv_document(content, file.filename)
+        return result
+    except ValueError as e:
+        # Jeśli serwis rzuci błędem o za dużym pliku, łapiemy to i zmieniamy w HTTP 413
+        raise HTTPException(status_code=413, detail=str(e))

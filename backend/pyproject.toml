@@ -30,6 +30,7 @@ dev = [
     "black",
     "mypy",
     "pytest",
+    "pytest-env",
     "alembic"
 ]
 
@@ -68,3 +69,7 @@ ignore_missing_imports = true
 testpaths = ["tests"]
 python_files = "test_*.py"
 filterwarnings = "ignore::DeprecationWarning"
+
+env_files = [
+    ".env.test"
+]
