@@ -3,7 +3,7 @@ from typing import AsyncGenerator, Dict
 
 from fastapi import FastAPI
 
-from app.api.v1.routes import health, ingestion
+from app.api.v1.router import api_router
 
 from .db.database import init_db
 
@@ -19,8 +19,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 app = FastAPI(title="CV AI Matcher", lifespan=lifespan)
 
 
-app.include_router(health.router, prefix="/api/v1", tags=["system"])
-app.include_router(ingestion.router, prefix="/api/v1", tags=["Ingestion"])
+app.include_router(api_router, prefix="/api/v1")
 
 
 @app.get("/")
