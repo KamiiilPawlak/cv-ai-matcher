@@ -31,7 +31,8 @@ dev = [
     "mypy",
     "pytest",
     "pytest-env",
-    "alembic"
+    "alembic",
+    "pre-commit"
 ]
 
 
