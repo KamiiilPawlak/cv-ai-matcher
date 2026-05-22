@@ -73,3 +73,8 @@ filterwarnings = "ignore::DeprecationWarning"
 env_files = [
     ".env.test"
 ]
+
+
+[tool.setuptools.packages.find]
+include = ["app"]
+exclude = ["uploads"]
