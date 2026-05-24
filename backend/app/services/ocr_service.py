@@ -2,6 +2,7 @@ import io
 
 import pdfplumber
 import pytesseract  # type: ignore
+from loguru import logger
 from pdf2image import convert_from_bytes
 from PIL import Image, ImageFilter, ImageOps
 
@@ -11,9 +12,11 @@ class OCRService:
     async def process_document(content: bytes, mime_type: str) -> str:
         if mime_type == "application/pdf":
             text = OCRService._extract_digital_text(content)
+            logger.info("Proba ekstrakcji tekstu cyfrowego z pliku PDF")
             if text.strip() and len(text) > 100:
+                logger.info("Pomyślnie wyekstrahowano tekst cyfrowy z PDF.")
                 return text
-
+        logger.info(f"Uruchamianie procesu OCR dla typu: {mime_type}")
         return await OCRService._extract_via_ocr(content, mime_type)
 
     @staticmethod
@@ -26,7 +29,8 @@ class OCRService:
                     if page_text:
                         full_text.append(page_text)
             return "\n".join(full_text)
-        except Exception:
+        except Exception as e:
+            logger.error(f"Błąd podczas ekstrakcji tekstu cyfrowego: {e}")
             return ""
 
     @staticmethod
