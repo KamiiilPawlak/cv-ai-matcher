@@ -8,9 +8,7 @@ from app.core.config import settings
 def verify_file_integrity(content: bytes) -> str:
 
     if not content:
-        logger.error(
-            "Proba weryfikacji pliku zakonczona niepowodzeniem przeslano pusta zawartosc"
-        )
+        logger.error("Plik jest pusty")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Przeslany plik jest pusty"
         )
