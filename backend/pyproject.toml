@@ -32,7 +32,8 @@ dev = [
     "pytest",
     "pytest-env",
     "alembic",
-    "pre-commit"
+    "pre-commit",
+    "loguru"
 ]
 
 
