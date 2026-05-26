@@ -1,11 +1,18 @@
 # CV AI Matcher
 
-AI system for matching CVs with job descriptions using LLMs.
+## Stack Backend
 
-## Stack
+- **Python 3.11+**
+- **FastAPI**
+- **Pydantic v2**
+- **SQLAlchemy**
 
-- FastAPI
-- LLM integration
-- PDF parsing
+## Text extraction
 
-## test
+- **PyMuPDF**
+- **Tesseract OCR**
+
+## Code quality and DevOps
+
+- **Docker**
+- **Ruff & Pre-commit**
