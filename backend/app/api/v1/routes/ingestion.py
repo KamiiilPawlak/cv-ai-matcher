@@ -20,6 +20,10 @@ async def process_cv_upload(file: UploadFile = File(...)) -> Dict[str, Any]:
 
     try:
         result = await IngestionService.process_cv_document(content, file.filename)
+        logger.info(f"Plik {file.filename} zostal poprawnie przetworzony")
         return result
     except ValueError as e:
+        logger.warning(
+            f"Blad walidacji pliku {file.filename} w IngestionService {str(e)}"
+        )
         raise HTTPException(status_code=413, detail=str(e))
