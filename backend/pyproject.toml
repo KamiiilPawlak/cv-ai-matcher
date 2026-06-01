@@ -33,7 +33,9 @@ dev = [
     "pytest-env",
     "alembic",
     "pre-commit",
-    "loguru"
+    "loguru",
+    "mkdocs-material",
+    "mkdocstrings[python]"
 ]
 
 
