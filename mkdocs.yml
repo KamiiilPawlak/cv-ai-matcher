@@ -1,0 +1,18 @@
+site_name: CV AI Matcher Docs
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: teal
+
+nav:
+  - Wprowadzenie: index.md
+  - Architektura i Decyzje:
+      - Bezpieczeństwo i Walidacja: architecture/security_policies.md
+      - Rejestr Decyzji (ADR): architecture/adr/0001-magic-bytes-validation.md
+  - Przewodniki (How-To):
+      - Uruchomienie lokalne: how-to/local_development.md
+      - Testowanie aplikacji: how-to/testing.md
+  - Referencja API i Kodu:
+      - Endpointy (Routes): reference/api_endpoints.md
+      - Usługi (Services): reference/ingestion_services.md
