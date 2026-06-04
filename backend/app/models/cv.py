@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlmodel import Field, SQLModel
@@ -13,7 +13,7 @@ class RawCV(SQLModel, table=True):
     )
     filename: str
     raw_text: str
-    uploaded_at: datetime = Field(default_factory=datetime.now)
+    uploaded_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class RawJobOffers(SQLModel, table=True):
@@ -25,4 +25,4 @@ class RawJobOffers(SQLModel, table=True):
     title: str
     description: str
     source: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.now)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
