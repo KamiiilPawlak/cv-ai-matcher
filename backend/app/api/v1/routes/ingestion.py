@@ -1,10 +1,10 @@
 from typing import Any, Dict
 
-from backend.app.db.database import get_session
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from loguru import logger
 from sqlmodel import Session
 
+from app.db.database import get_session
 from app.schema.ingestion_dto import IngestionResponse
 from app.services.ingestion_service import IngestionService
 
