@@ -1,9 +1,10 @@
+from fastapi import HTTPException
 from loguru import logger
 from sqlmodel import Session
 
 from app.core.config import settings
 from app.core.security import verify_file_integrity
-from app.models.cv import RawCV
+from app.models.cv import DataLakeCV
 from app.services.file_service import save_upload_file
 from app.services.ocr_service import OCRService
 
@@ -36,17 +37,17 @@ class IngestionService:
         _ = await save_upload_file(content, filename)
 
         try:
-            db_cv = RawCV(filename=filename, raw_text=extracted_text)
+            db_cv = DataLakeCV(filename=filename, raw_text=extracted_text)
             session.add(db_cv)
             session.commit()
             session.refresh(db_cv)
             logger.info(f"Raw CV metadane zostaly zapisane do bazy z ID: {db_cv.id}")
         except Exception as e:
-            logger.error(f"Zapisane RawCV do bazy danych{e}")
+            logger.error(f"Blad zapisu do bazy danych {e}")
             session.rollback()
             raise e
 
-        file_id = db_cv.id
+        file_id = str(db_cv.id)
         logger.info(
             f"Pipline zakoczony sukceem dla {filename}. Zapisane jako ID: {file_id}"
         )
@@ -58,3 +59,18 @@ class IngestionService:
             "original_name": filename,
             "extracted_content": extracted_text,
         }
+
+    @staticmethod
+    async def delete_cv_document(session: Session, file_id: str) -> None:
+        db_cv = session.get(DataLakeCV, file_id)
+
+        if not db_cv:
+            logger.warning(f"Attempted to delete non-existent CV: {file_id}")
+            raise HTTPException(
+                status_code=404, detail="Nie znaleziono dokumentu o podanym ID"
+            )
+
+        session.delete(db_cv)
+        session.commit()
+
+        logger.info(f"Rekord Datalake o ID {file_id} zostal bezpowrotnie usuniety")
