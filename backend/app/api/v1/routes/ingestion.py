@@ -41,3 +41,11 @@ async def process_cv_upload(
         raise HTTPException(
             status_code=500, detail="Wystapil blad serwera podczas zapisu pliku"
         )
+
+
+@router.delete("/cv/{file_id}", status_code=204)
+async def delete_cv(file_id: str, session: Session = Depends(get_session)):
+    logger.info(f"Zapytanie o usuniecie CV o ID: {file_id}")
+    await IngestionService.delete_cv_document(session, file_id)
+
+    return None

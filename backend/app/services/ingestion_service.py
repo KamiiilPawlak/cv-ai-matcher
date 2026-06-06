@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from loguru import logger
 from sqlmodel import Session
 
@@ -58,3 +59,18 @@ class IngestionService:
             "original_name": filename,
             "extracted_content": extracted_text,
         }
+
+    @staticmethod
+    async def delete_cv_document(session: Session, file_id: str) -> None:
+        db_cv = session.get(DataLakeCV, file_id)
+
+        if not db_cv:
+            logger.warning(f"Attempted to delete non-existent CV: {file_id}")
+            raise HTTPException(
+                status_code=404, detail="Nie znaleziono dokumentu o podanym ID"
+            )
+
+        session.delete(db_cv)
+        session.commit()
+
+        logger.info(f"Rekord Datalake o ID {file_id} zostal bezpowrotnie usuniety")
