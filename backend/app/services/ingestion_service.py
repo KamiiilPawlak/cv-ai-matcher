@@ -1,3 +1,4 @@
+# app/services/ingestion_service.py
 from fastapi import HTTPException
 from loguru import logger
 from sqlmodel import Session
@@ -7,6 +8,7 @@ from app.core.security import verify_file_integrity
 from app.models.cv import DataLakeCV
 from app.services.file_service import save_upload_file
 from app.services.ocr_service import OCRService
+from app import crud
 
 
 class IngestionService:
@@ -36,16 +38,7 @@ class IngestionService:
 
         _ = await save_upload_file(content, filename)
 
-        try:
-            db_cv = DataLakeCV(filename=filename, raw_text=extracted_text)
-            session.add(db_cv)
-            session.commit()
-            session.refresh(db_cv)
-            logger.info(f"Raw CV metadane zostaly zapisane do bazy z ID: {db_cv.id}")
-        except Exception as e:
-            logger.error(f"Blad zapisu do bazy danych {e}")
-            session.rollback()
-            raise e
+        db_cv = crud.save_raw_cv(session=session, filename=filename, raw_text=extracted_text)
 
         file_id = str(db_cv.id)
         logger.info(
