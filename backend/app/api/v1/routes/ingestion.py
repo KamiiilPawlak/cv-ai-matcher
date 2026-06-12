@@ -6,14 +6,16 @@ from sqlmodel import Session
 
 from app.db.database import get_session
 from app.schema.ingestion_dto import IngestionResponse
-from app.services.cv_ingestion.ingestion_service import IngestionService
+from app.services.ingestion_service.ingestion_service import IngestionService
 
 router = APIRouter()
 
 
 @router.post("/upload", response_model=IngestionResponse)
 async def process_cv_upload(
-    file: UploadFile = File(...), session: Session = Depends(get_session)
+    file: UploadFile = File(...),
+    session: Session = Depends(get_session),
+    ingestion_service: IngestionService = Depends(),
 ) -> Dict[str, Any]:
     logger.info(f"Rozpoczeto proces uploadu pliku: {file.filename}")
     if file.filename is None:
@@ -23,7 +25,7 @@ async def process_cv_upload(
     content = await file.read()
 
     try:
-        result = await IngestionService.process_cv_document(
+        result = await ingestion_service.process_cv_document(
             session,
             content,
             file.filename,

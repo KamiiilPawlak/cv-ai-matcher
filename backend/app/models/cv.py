@@ -1,6 +1,5 @@
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
 
 from sqlmodel import Field, SQLModel
 
@@ -16,6 +15,3 @@ class DataLakeCV(SQLModel, table=True):
     filename: str
     raw_text: str
     uploaded_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-
-

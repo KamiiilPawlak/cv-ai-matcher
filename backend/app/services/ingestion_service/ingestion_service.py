@@ -1,6 +1,4 @@
 # app/services/ingestion_service.py
-from backend.app.services.cv_ingestion.file_service import CVFileService
-from backend.app.services.cv_ingestion.ocr_service import OCRService
 from fastapi import Depends, HTTPException
 from loguru import logger
 from sqlmodel import Session
@@ -8,7 +6,10 @@ from sqlmodel import Session
 from app import crud
 from app.core.config import settings
 from app.core.security import verify_file_integrity
-from app.models.cv import DataLakeCV
+from app.models import DataLakeCV
+
+from .file_service import CVFileService
+from .ocr_service import OCRService
 
 
 class IngestionService:
@@ -38,9 +39,7 @@ class IngestionService:
         logger.debug(f"File {filename} integrity verified. Detected MIME: {mime_type}")
 
         try:
-            ocr_engine = OCRService()
-
-            extracted_text = await ocr_engine.process_document(content, mime_type)
+            extracted_text = await self.ocr_service.process_document(content, mime_type)
             extracted_text = extracted_text.strip() if extracted_text else ""
             logger.info(
                 f"Text successfully extracted from {filename} ({len(extracted_text)})"
