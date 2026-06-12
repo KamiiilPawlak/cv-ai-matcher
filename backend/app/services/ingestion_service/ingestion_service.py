@@ -1,14 +1,14 @@
 # app/services/ingestion_service.py
+from backend.app.services.ingestion_service.file_service import save_upload_file
+from backend.app.services.ingestion_service.ocr_service import OCRService
 from fastapi import HTTPException
 from loguru import logger
 from sqlmodel import Session
 
+from app import crud
 from app.core.config import settings
 from app.core.security import verify_file_integrity
 from app.models.cv import DataLakeCV
-from app.services.file_service import save_upload_file
-from app.services.ocr_service import OCRService
-from app import crud
 
 
 class IngestionService:
@@ -38,7 +38,9 @@ class IngestionService:
 
         _ = await save_upload_file(content, filename)
 
-        db_cv = crud.save_raw_cv(session=session, filename=filename, raw_text=extracted_text)
+        db_cv = crud.save_raw_cv(
+            session=session, filename=filename, raw_text=extracted_text
+        )
 
         file_id = str(db_cv.id)
         logger.info(

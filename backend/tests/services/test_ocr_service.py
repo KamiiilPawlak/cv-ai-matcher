@@ -1,8 +1,7 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest  # type: ignore
-
-from app.services.ocr_service import OCRService
+from backend.app.services.ingestion_service.ocr_service import OCRService
 
 pytestmark = pytest.mark.anyio
 
