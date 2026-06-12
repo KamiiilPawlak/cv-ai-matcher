@@ -1,7 +1,7 @@
 # app/services/ingestion_service.py
-from backend.app.services.cv_ingestion.file_service import save_upload_file
+from backend.app.services.cv_ingestion.file_service import CVFileService
 from backend.app.services.cv_ingestion.ocr_service import OCRService
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
 from loguru import logger
 from sqlmodel import Session
 
@@ -12,9 +12,20 @@ from app.models.cv import DataLakeCV
 
 
 class IngestionService:
-    @staticmethod
+    def __init__(
+        self,
+        file_service: CVFileService = Depends(),
+        ocr_service: OCRService = Depends(),
+    ):
+        self.file_service = file_service
+        self.ocr_service = ocr_service
+
     async def process_cv_document(
-        session: Session, content: bytes, filename: str, content_type: str | None = None
+        self,
+        session: Session,
+        content: bytes,
+        filename: str,
+        content_type: str | None = None,
     ) -> dict:
 
         logger.info(f"Processing document pipeline started for file: {filename}")
@@ -27,7 +38,9 @@ class IngestionService:
         logger.debug(f"File {filename} integrity verified. Detected MIME: {mime_type}")
 
         try:
-            extracted_text = await OCRService.process_document(content, mime_type)
+            ocr_engine = OCRService()
+
+            extracted_text = await ocr_engine.process_document(content, mime_type)
             extracted_text = extracted_text.strip() if extracted_text else ""
             logger.info(
                 f"Text successfully extracted from {filename} ({len(extracted_text)})"
@@ -36,7 +49,9 @@ class IngestionService:
             logger.error(f"OCR engine extraction failed for {filename}: {e}")
             extracted_text = f"Blad podczas ekstrakcji tekstu {str(e)}"
 
-        _ = await save_upload_file(content, filename)
+        _ = await self.file_service.save_upload_file(
+            content, original_filename=filename
+        )
 
         db_cv = crud.save_raw_cv(
             session=session, filename=filename, raw_text=extracted_text
