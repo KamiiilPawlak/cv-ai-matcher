@@ -1,6 +1,4 @@
 # app/services/ingestion_service.py
-from backend.app.services.cv_ingestion.file_service import CVFileService
-from backend.app.services.cv_ingestion.ocr_service import OCRService
 from fastapi import Depends, HTTPException
 from loguru import logger
 from sqlmodel import Session
@@ -8,7 +6,9 @@ from sqlmodel import Session
 from app import crud
 from app.core.config import settings
 from app.core.security import verify_file_integrity
-from app.models.cv import DataLakeCV
+from app.models import DataLakeCV
+
+from ..ingestion_service import CVFileService, OCRService
 
 
 class IngestionService:
