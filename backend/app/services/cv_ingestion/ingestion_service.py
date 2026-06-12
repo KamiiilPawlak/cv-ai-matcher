@@ -1,6 +1,6 @@
 # app/services/ingestion_service.py
-from backend.app.services.ingestion_service.file_service import save_upload_file
-from backend.app.services.ingestion_service.ocr_service import OCRService
+from backend.app.services.cv_ingestion.file_service import save_upload_file
+from backend.app.services.cv_ingestion.ocr_service import OCRService
 from fastapi import HTTPException
 from loguru import logger
 from sqlmodel import Session

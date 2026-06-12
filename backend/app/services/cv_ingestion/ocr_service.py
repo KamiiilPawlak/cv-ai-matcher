@@ -1,3 +1,4 @@
+import asyncio
 import io
 
 import pdfplumber
@@ -8,19 +9,17 @@ from PIL import Image, ImageFilter, ImageOps
 
 
 class OCRService:
-    @staticmethod
-    async def process_document(content: bytes, mime_type: str) -> str:
+    async def process_document(self, content: bytes, mime_type: str) -> str:
         if mime_type == "application/pdf":
-            text = OCRService._extract_digital_text(content)
+            text = self._extract_digital_text(content)
             logger.info("Proba ekstrakcji tekstu cyfrowego z pliku PDF")
             if text.strip() and len(text) > 100:
                 logger.info("Pomyślnie wyekstrahowano tekst cyfrowy z PDF.")
                 return text
         logger.info(f"Uruchamianie procesu OCR dla typu: {mime_type}")
-        return await OCRService._extract_via_ocr(content, mime_type)
+        return await asyncio.to_thread(self._extract_via_ocr, content, mime_type)
 
-    @staticmethod
-    def _extract_digital_text(content: bytes) -> str:
+    def _extract_digital_text(self, content: bytes) -> str:
         full_text = []
         try:
             with pdfplumber.open(io.BytesIO(content)) as pdf:
@@ -33,8 +32,7 @@ class OCRService:
             logger.error(f"Błąd podczas ekstrakcji tekstu cyfrowego: {e}")
             return ""
 
-    @staticmethod
-    async def _extract_via_ocr(content: bytes, mime_type: str) -> str:
+    def _extract_via_ocr(self, content: bytes, mime_type: str) -> str:
         if mime_type == "application/pdf":
             images = convert_from_bytes(content)
         else:
@@ -43,14 +41,13 @@ class OCRService:
         results = []
 
         for img in images:
-            processed = OCRService._apply_pil_filters(img)
+            processed = self._apply_pil_filters(img)
             text = pytesseract.image_to_string(processed, lang="pol+eng")
             results.append(text)
 
         return "\n".join(results)
 
-    @staticmethod
-    def _apply_pil_filters(img: Image.Image) -> Image.Image:
+    def _apply_pil_filters(self, img: Image.Image) -> Image.Image:
         img = img.convert("L")
         img = ImageOps.autocontrast(img)
         img = img.filter(ImageFilter.SHARPEN)

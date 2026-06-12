@@ -1,5 +1,5 @@
 import pytest  # type: ignore
-from backend.app.services.ingestion_service.file_service import save_upload_file
+from backend.app.services.cv_ingestion.file_service import save_upload_file
 
 from app.core.config import settings
 
