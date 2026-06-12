@@ -39,9 +39,7 @@ class IngestionService:
         logger.debug(f"File {filename} integrity verified. Detected MIME: {mime_type}")
 
         try:
-            ocr_engine = OCRService()
-
-            extracted_text = await ocr_engine.process_document(content, mime_type)
+            extracted_text = await self.ocr_service.process_document(content, mime_type)
             extracted_text = extracted_text.strip() if extracted_text else ""
             logger.info(
                 f"Text successfully extracted from {filename} ({len(extracted_text)})"
