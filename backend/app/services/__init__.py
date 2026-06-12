@@ -1,5 +1,4 @@
-from .ingestion_service.file_service import CVFileService
-from .ingestion_service.ingestion_service import IngestionService
-from .ingestion_service.ocr_service import OCRService
+# app/services/__init__.py
+from .ingestion_service import CVFileService, IngestionService, OCRService
 
-__all__ = ["IngestionService", "CVFileService", "OCRService"]
+__all__ = ["CVFileService", "OCRService", "IngestionService"]

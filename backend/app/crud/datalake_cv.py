@@ -3,7 +3,7 @@ from uuid import UUID
 from loguru import logger
 from sqlmodel import Session
 
-from app.models import DataLakeCV
+from app.models.cv import DataLakeCV
 
 
 def save_raw_cv(session: Session, filename: str, raw_text: str) -> DataLakeCV:

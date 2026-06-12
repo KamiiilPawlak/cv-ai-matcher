@@ -8,7 +8,8 @@ from app.core.config import settings
 from app.core.security import verify_file_integrity
 from app.models import DataLakeCV
 
-from ..ingestion_service import CVFileService, OCRService
+from .file_service import CVFileService
+from .ocr_service import OCRService
 
 
 class IngestionService:
