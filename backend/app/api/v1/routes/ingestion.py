@@ -6,7 +6,7 @@ from sqlmodel import Session
 
 from app.db.database import get_session
 from app.schema.ingestion_dto import IngestionResponse
-from app.services.ingestion_service import IngestionService
+from app.services.cv_ingestion.ingestion_service import IngestionService
 
 router = APIRouter()
 

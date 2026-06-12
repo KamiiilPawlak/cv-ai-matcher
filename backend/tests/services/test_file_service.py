@@ -1,7 +1,7 @@
 import pytest  # type: ignore
+from backend.app.services.cv_ingestion.file_service import save_upload_file
 
 from app.core.config import settings
-from app.services.file_service import save_upload_file
 
 pytestmark = pytest.mark.anyio
 
