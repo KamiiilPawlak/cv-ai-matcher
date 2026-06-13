@@ -21,7 +21,9 @@ dependencies = [
     "sqlmodel>=0.0.22",
     "asyncpg",
     "pdf2image",
-    "psycopg2-binary"
+    "psycopg2-binary",
+    "ftfy",
+    "regex"
 ]
 
 [project.optional-dependencies]

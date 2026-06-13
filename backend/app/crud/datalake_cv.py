@@ -22,9 +22,9 @@ def save_raw_cv(session: Session, filename: str, raw_text: str) -> DataLakeCV:
         raise e
 
 
-def get_raw_cv(session: Session, file_id: UUID) -> DataLakeCV | None:
+def get_raw_cv(session: Session, cv_id: UUID) -> DataLakeCV | None:
     """Pobiera rekord CV z warstwy Data Lake CV"""
-    return session.get(DataLakeCV, file_id)
+    return session.get(DataLakeCV, cv_id)
 
 
 def delete_raw_cv(session: Session, db_cv: DataLakeCV) -> None:
