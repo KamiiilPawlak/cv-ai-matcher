@@ -10,6 +10,19 @@ from PIL import Image, ImageFilter, ImageOps
 
 class OCRService:
     async def process_document(self, content: bytes, mime_type: str) -> str:
+        """Ekstrahuje tekst z dokumentu, stosując hybrydową strategię (PDF / OCR).
+
+        Najpierw próbuje pobrać tekst cyfrowy z PDF. Jeśli plik go nie posiada,
+        jest obrazem lub tekst ma poniżej 100 znaków, uruchamia proces OCR.
+        Operacja OCR jest delegowana do osobnego wątku (CPU-bound).
+
+        Args:
+            content (bytes): Surowa zawartość pliku w bajtach.
+            mime_type (str): Typ MIME pliku (np. "application/pdf").
+
+        Returns:
+            str: Wyekstrahowany tekst przygotowany do potoku ETL.
+        """
         if mime_type == "application/pdf":
             text = self._extract_digital_text(content)
             logger.info("Proba ekstrakcji tekstu cyfrowego z pliku PDF")
@@ -48,6 +61,7 @@ class OCRService:
         return "\n".join(results)
 
     def _apply_pil_filters(self, img: Image.Image) -> Image.Image:
+
         img = img.convert("L")
         img = ImageOps.autocontrast(img)
         img = img.filter(ImageFilter.SHARPEN)

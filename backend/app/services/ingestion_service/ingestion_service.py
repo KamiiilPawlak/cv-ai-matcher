@@ -28,6 +28,25 @@ class IngestionService:
         filename: str,
         content_type: str | None = None,
     ) -> dict:
+        """Orkiestruje pełny potok wejściowy (Ingestion Pipeline) dla nowego pliku CV.
+
+        Weryfikuje limit rozmiaru pliku, sprawdza integralność binarną (Magic Bytes),
+        zleca ekstrakcję tekstu do OCR Service, a następnie asynchronicznie zapisuje
+        plik na dysku i rejestruje surowy tekst w bazie danych przez warstwę CRUD.
+
+        Args:
+            session (Session): Sesja bazy danych do zapisu encji CV.
+            content (bytes): Surowa zawartość pliku w bajtach.
+            filename (str): Oryginalna nazwa przesyłanego pliku.
+            content_type (str | None): Opcjonalny nagłówek Content-Type z żądania.
+
+        Returns:
+            dict: Słownik wynikowy zawierający status operacji, ID z bazy danych,
+                  zweryfikowany typ MIME oraz wyekstrahowany tekst.
+
+        Raises:
+            ValueError: Gdy rozmiar pliku przekracza limit zdefiniowany w ustawieniach.
+        """
 
         logger.info(f"Processing document pipeline started for file: {filename}")
 
@@ -71,6 +90,19 @@ class IngestionService:
 
     @staticmethod
     async def delete_cv_document(session: Session, file_id: str) -> None:
+        """Usuwa bezpowrotnie rekord dokumentu CV z bazy danych (Data Lake).
+
+        Wyszukuje encję po ID. Jeśli rekord istnieje, zostaje skasowany z bazy,
+        a transakcja zostaje zatwierdzona (commit). W przypadku braku rekordu
+        podnosi wyjątek HTTP 404.
+
+        Args:
+            session (Session): Sesja bazy danych do wykonania operacji.
+            file_id (str): Identyfikator dokumentu do usunięcia.
+
+        Raises:
+            HTTPException: Z kodem statusu 404, jeśli dokument nie istnieje w bazie.
+        """
         db_cv = session.get(DataLakeCV, file_id)
 
         if not db_cv:

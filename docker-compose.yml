@@ -1,7 +1,7 @@
 services:
   api:
     build:
-      context: ./backend
+      context: ./backend/app:/code/app
       dockerfile: Dockerfile
     container_name: cv-ai-matcher-backend
     ports:
