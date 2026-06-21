@@ -1,18 +1,56 @@
-site_name: CV AI Matcher Docs
+site_name: CV AI Matcher - Dokumentacja Systemu
+
 theme:
   name: material
+  language: pl
   palette:
-    scheme: slate
-    primary: teal
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Przełącz na tryb ciemny
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Przełącz na tryb jasny
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: ["backend"]
+          options:
+            show_source: true
+            show_root_heading: true
+            heading_level: 2
+
+markdown_extensions:
+  - tables
+  - attr_list
+  - md_in_html
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
 
 nav:
-  - Wprowadzenie: index.md
-  - Architektura i Decyzje:
-      - Bezpieczeństwo i Walidacja: architecture/security_policies.md
-      - Rejestr Decyzji (ADR): architecture/adr/0001-magic-bytes-validation.md
-  - Przewodniki (How-To):
-      - Uruchomienie lokalne: how-to/local_development.md
-      - Testowanie aplikacji: how-to/testing.md
-  - Referencja API i Kodu:
-      - Endpointy (Routes): reference/api_endpoints.md
-      - Usługi (Services): reference/ingestion_services.md
+  - Strona Główna: index.md
+  - Architektura:
+      - Decyzje (ADR): architecture/adr/0001-magic-bytes-validation.md
+      - Bezpieczeństwo: architecture/security_policies.md
+  - Instrukcje (How-To):
+      - Lokalne Uruchomienie: how-to/local_development.md
+      - Testowanie: how-to/testing.md
+  - Dokumentacja Kodu (API):
+      - Punkty Końcowe (Endpoints): reference/api_endpoints.md
+      - Moduł Ingestion: reference/ingestion_services.md
+      - ETL CV: reference/etl_cv_services.md
