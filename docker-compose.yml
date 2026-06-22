@@ -1,13 +1,50 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cv-ai-matcher-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: abcd1234
+      POSTGRES_DB: cv_ai_matcher
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   api:
     build:
-      context: ./backend/app:/code/app
+      context: ./backend
       dockerfile: Dockerfile
     container_name: cv-ai-matcher-backend
+    restart: always
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/code
     environment:
       - WATCHFILES_FORCE_POLLING=true
+      - DATABASE_URL=postgresql://postgres:abcd1234@postgres:5432/cv_ai_matcher
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  mkdocs:
+    build:
+      context: .
+      dockerfile: Dockerfile.docs
+    container_name: cv-ai-matcher-docs
+    ports:
+      - "8001:8000"
+    volumes:
+      - .:/docs
+    command: serve --dev-addr 0.0.0.0:8000
+
+volumes:
+  postgres_data:
