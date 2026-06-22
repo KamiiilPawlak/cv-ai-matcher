@@ -20,8 +20,8 @@ graph TD
     B --> C[2. Normalizacja<br>normalization.py]
     C --> D[3. Heurystyka]
     D --> E[4. Heurestyka section plitting]
-    E --> F[4. Przetwarzanie LLM]
-    F --> G[5. Walidacja Danych]
+    E --> F[5. Przetwarzanie LLM]
+    F --> G[6. Walidacja Danych]
     G --> H[(PostgreSQL: structured_db)]
 
     %% Przypisanie stylów
@@ -34,6 +34,16 @@ graph TD
 ---
 
 ## Główne Komponenty
+
+### 0. Orkiestrator (`pipeline.py`)
+
+Klasa `CvEtlPipeline` działa jako główny **orkiestrator całego procesu**. Jej zadaniem jest zapewnienie sekwencyjnego przepływu danych.
+
+- **Zarządzanie stanem:** Pobiera surowy tekst z tabeli `data_lake_cv` na podstawie przekazanego `file_id`.
+- **Wykonanie etapów:** Przekazuje tekst najpierw do modułu czyszczącego (`clean_ocr_text`), a następnie do normalizatora (`CVTextNormalizer`).
+- **Zapis (Load):** Po przejściu wszystkich transformacji, orkiestrator automatycznie zapisuje gotowy, oczyszczony produkt do nowej warstwy bazy danych (`processed_cv`), udostępniając go kolejnym modułom systemu.
+
+---
 
 ### 1. Czyszczenie Tekstu (`cleaning.py`)
 

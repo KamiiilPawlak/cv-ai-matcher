@@ -7,7 +7,7 @@ from sqlmodel import Session
 
 from app.crud.datalake_cv import get_raw_cv, save_processed_cv
 from app.models.cv import ProcessedCV
-from app.services.etl_cv_service.transformers.cleaninig import clean_ocr_text
+from app.services.etl_cv_service.transformers.cleaning import clean_ocr_text
 from app.services.etl_cv_service.transformers.normalization import CVTextNormalizer
 
 
