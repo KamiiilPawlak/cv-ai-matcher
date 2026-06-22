@@ -1,5 +1,5 @@
-import uuid
 from datetime import datetime, timezone
+from uuid import UUID, uuid4
 
 from sqlmodel import Field, SQLModel
 
@@ -9,9 +9,20 @@ class DataLakeCV(SQLModel, table=True):
 
     __tablename__ = "data_lake_cv"  # type: ignore
 
-    id: uuid.UUID = Field(
-        default_factory=uuid.uuid4, primary_key=True, index=True, nullable=False
+    id: UUID = Field(
+        default_factory=uuid4, primary_key=True, index=True, nullable=False
     )
     filename: str
     raw_text: str
     uploaded_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class ProcessedCV(SQLModel, table=True):
+    __tablename__: str = "processed_cv"  # type: ignore
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
+
+    file_id: UUID = Field(foreign_key="data_lake_cv.id", index=True, unique=True)
+
+    normalized_text: str
+    processed_at: datetime = Field(default_factory=datetime.utcnow)

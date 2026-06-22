@@ -4,14 +4,14 @@ from loguru import logger
 from sqlmodel import Session, SQLModel, create_engine
 
 from ..core.config import settings
-from ..models.cv import DataLakeCV
+from ..models.cv import DataLakeCV, ProcessedCV
 
 engine = create_engine(settings.DATABASE_URL, echo=True)
 
 
 def init_db() -> None:
     logger.info("Inicjalizacja bazy danych")
-    _ = [DataLakeCV]
+    _ = [DataLakeCV, ProcessedCV]
     logger.success("Tabela bazy danych zostala pomyslnie utworzona")
     SQLModel.metadata.create_all(engine)
 
