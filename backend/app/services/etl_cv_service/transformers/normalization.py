@@ -1,4 +1,4 @@
-import regex
+import regex # type: ignore[import-untyped]
 from loguru import logger
 
 
