@@ -1,20 +1,23 @@
 # app/services/etl_cv_service/pipeline.py
 
+import email
 from uuid import UUID
 
 from loguru import logger
 from sqlmodel import Session
 
-from app.crud.datalake_cv import get_raw_cv, save_processed_cv
+from app.crud.datalake_cv import get_raw_cv
+from app.crud.processed import save_processed_cv
 from app.models.cv import ProcessedCV
 from app.services.etl_cv_service.transformers.cleaning import clean_ocr_text
 from app.services.etl_cv_service.transformers.normalization import CVTextNormalizer
-
+from app.services.etl_cv_service.transformers.enrichment import CVEnricher
 
 class CvEtlPipeline:
     def __init__(self):
         self.cleaner = clean_ocr_text
         self.normalizer = CVTextNormalizer()
+        self.enricher = CVEnricher()
 
     async def execute(self, session: Session, file_id: UUID) -> ProcessedCV:
         """Główny orkiestrator ETL dla CV pobieranego z Data Lake (Raw data db PostgresSQL)"""
@@ -34,9 +37,16 @@ class CvEtlPipeline:
         cleaned_text = self.cleaner(raw_text)
 
         normalized_text = self.normalizer.normalize_text(cleaned_text)
+    
+        metadata_dto = self.enricher.extract_metadata(normalized_text)
 
+      
         processed_cv_record = save_processed_cv(
-            session=session, file_id=file_id, normalized_text=normalized_text
+            session,
+            file_id,
+            normalized_text,
+            email=metadata_dto.email,
+            phone=metadata_dto.phone
         )
 
         logger.success(

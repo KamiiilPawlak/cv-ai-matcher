@@ -25,4 +25,9 @@ class ProcessedCV(SQLModel, table=True):
     file_id: UUID = Field(foreign_key="data_lake_cv.id", index=True, unique=True)
 
     normalized_text: str
+
+    email: str | None = Field(default=None, index=True)
+    phone: str | None = Field(default=None)
+
+    
     processed_at: datetime = Field(default_factory=datetime.utcnow)

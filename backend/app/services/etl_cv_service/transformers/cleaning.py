@@ -1,7 +1,7 @@
 import unicodedata
 
 import ftfy
-import regex
+import regex # type: ignore[import-untyped]
 
 
 def _repair_ocr_mojibake(text: str) -> str:
