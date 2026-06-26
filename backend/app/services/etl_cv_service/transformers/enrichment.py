@@ -1,23 +1,23 @@
-import regex # type: ignore[import-untyped]
 from typing import Optional
+
+import regex  # type: ignore[import-untyped]
 from loguru import logger
+
 from app.schema.ingestion_dto import ExtractedMetadata
 
 
 class CVEnricher:
-   
     EMAIL_REGEX = regex.compile(
         r"[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}", regex.IGNORECASE
     )
 
-    PHONE_REGEX = regex.compile(r"\b(\+?\d{9,12})\b")
+    PHONE_REGEX = regex.compile(r"(?:\+)?\b(\d{9,12})\b")
 
     @classmethod
     def extract_metadata(cls, normalized_text: str) -> ExtractedMetadata:
         if not normalized_text:
             logger.warning("Otrzymano pusty tekst do ekstrakcji metadanych.")
             return ExtractedMetadata(email=None, phone=None)
-        
 
         email_match = cls.EMAIL_REGEX.search(normalized_text)
         phone_match = cls.PHONE_REGEX.search(normalized_text)

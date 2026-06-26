@@ -44,7 +44,7 @@ services:
       - "8001:8000"
     volumes:
       - .:/docs
-    command: serve --dev-addr 0.0.0.0:8000
+    command: mkdocs serve --dev-addr 0.0.0.0:8000
 
 volumes:
   postgres_data:
