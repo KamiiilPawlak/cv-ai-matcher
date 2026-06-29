@@ -14,6 +14,10 @@ WHITESPACE_INLINE_PATTERN = regex.compile(r"[\p{Zs}\t]+")
 MULTILINE_REDUNDANT_NEWLINES = regex.compile(r"\n{3,}")
 
 
+def _normalize_unicode(text: str) -> str:
+    return unicodedata.normalize("NFC", text)
+
+
 def _repair_ocr_mojibake(text: str) -> str:
     text = MOJIBAKE_MID_PATTERN.sub(r"\1ż\2", text)
     text = MOJIBAKE_START_PATTERN.sub(r"ż\1", text)
@@ -33,12 +37,14 @@ def _normalize_whitespace(text: str) -> str:
 
 
 def clean_ocr_text(raw_text: str) -> str:
+    """Orkiestrator pipline cleaning data"""
 
     if not raw_text:
         return ""
 
-    text = unicodedata.normalize("NFC", raw_text)
+    text = _normalize_unicode(raw_text)
     text = _repair_ocr_mojibake(text)
     text = _remove_graphic_noise(text)
     text = _normalize_whitespace(text)
+
     return text.strip()
