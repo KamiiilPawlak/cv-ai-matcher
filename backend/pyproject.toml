@@ -31,8 +31,6 @@ dev = [
     "ruff",
     "black",
     "mypy",
-    "pytest",
-    "pytest-env",
     "alembic",
     "pre-commit",
     "loguru",
@@ -45,7 +43,9 @@ dev = [
     "pytest",
     "pytest-env",
     "pytest-asyncio",
-    "pytest-mock"
+    "pytest-mock",
+    "radon",
+    "cohesion"
 ]
 
 
@@ -89,7 +89,25 @@ env_files = [
     ".env.test"
 ]
 
+[tool.radon]
+cc_min = "B"
+cc_sort = "score"
+show_complexity = true
+show_closures = true
+color = true
+ignore = [
+    ".venv",
+    "venv",
+    "tests",
+    "uploads",
+    "logs",
+    "__pycache__"
+]
+exclude = "**/test_*.py|**/__pycache__/*"
+
 
 [tool.setuptools.packages.find]
 include = ["app"]
 exclude = ["uploads"]
+
+

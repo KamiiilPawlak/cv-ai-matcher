@@ -1,5 +1,6 @@
 import asyncio
 import io
+from dataclasses import dataclass
 
 import pdfplumber
 import pytesseract  # type: ignore
@@ -8,7 +9,19 @@ from pdf2image import convert_from_bytes
 from PIL import Image, ImageFilter, ImageOps
 
 
+@dataclass(frozen=True)
+class OCRConfig:
+    """Niezmienna konfiguracja parametrów dla OCRService."""
+
+    min_text_length: int = 100
+    tesseract_lang: str = "pol+eng"
+    apply_sharpen: bool = True
+
+
 class OCRService:
+    def __init__(self, config: OCRConfig = OCRConfig()) -> None:
+        self._config = config
+
     async def process_document(self, content: bytes, mime_type: str) -> str:
         """Ekstrahuje tekst z dokumentu, stosując hybrydową strategię (PDF / OCR).
 
@@ -26,7 +39,7 @@ class OCRService:
         if mime_type == "application/pdf":
             text = self._extract_digital_text(content)
             logger.info("Proba ekstrakcji tekstu cyfrowego z pliku PDF")
-            if text.strip() and len(text) > 100:
+            if text.strip() and len(text) > self._config.min_text_length:
                 logger.info("Pomyślnie wyekstrahowano tekst cyfrowy z PDF.")
                 return text
         logger.info(f"Uruchamianie procesu OCR dla typu: {mime_type}")
@@ -40,6 +53,14 @@ class OCRService:
                     page_text = page.extract_text()
                     if page_text:
                         full_text.append(page_text)
+
+                    current_length = len("\n".join(full_text).strip())
+                    if current_length > self._config.min_text_length:
+                        logger.info(
+                            "Przekroczono minimalny próg tekstu cyfrowego, przerywam czytanie PDF."
+                        )
+                        break
+
             return "\n".join(full_text)
         except Exception as e:
             logger.error(f"Błąd podczas ekstrakcji tekstu cyfrowego: {e}")
@@ -55,7 +76,9 @@ class OCRService:
 
         for img in images:
             processed = self._apply_pil_filters(img)
-            text = pytesseract.image_to_string(processed, lang="pol+eng")
+            text = pytesseract.image_to_string(
+                processed, lang=self._config.tesseract_lang
+            )
             results.append(text)
 
         return "\n".join(results)
@@ -64,5 +87,7 @@ class OCRService:
 
         img = img.convert("L")
         img = ImageOps.autocontrast(img)
-        img = img.filter(ImageFilter.SHARPEN)
+        if self._config.apply_sharpen:
+            img = img.filter(ImageFilter.SHARPEN)
+
         return img
