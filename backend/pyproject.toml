@@ -41,7 +41,7 @@ dev = [
     "pylint",
     "graphviz",
     "pytest",
-    "pytest-env",
+    "pytest-dotenv",
     "pytest-asyncio",
     "pytest-mock",
     "radon",

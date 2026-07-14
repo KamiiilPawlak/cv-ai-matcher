@@ -7,6 +7,8 @@ from app.core.config import settings
 
 
 class CVFileService:
+    def __init__(self): ...
+
     async def save_upload_file(self, content: bytes, original_filename: str) -> str:
         settings.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
