@@ -3,8 +3,8 @@ import unicodedata
 import ftfy
 import regex  # type: ignore[import-untyped]
 
-MOJIBAKE_MID_PATTERN = regex.compile(r"(\p{L})[^\p{L}\s'’`\-\.@+#](\p{L})")
-MOJIBAKE_START_PATTERN = regex.compile(r"\b[^\p{L}\s'’`\-\.@+#](\p{L})")
+MOJIBAKE_MID_PATTERN = regex.compile(r"(\p{L})[^\p{L}\s'’`\-\.@+](\p{L})")
+MOJIBAKE_START_PATTERN = regex.compile(r"\b[^\p{L}\s'’`\-\.@+](\p{L})")
 
 GRAPHIC_NOISE_PATTERN = regex.compile(r"[-_.*•■♦’'’`„”\"«»]{3,}")
 CID_PATTERN = regex.compile(r"\(cid:\d+\)")
@@ -19,6 +19,9 @@ def _normalize_unicode(text: str) -> str:
 
 
 def _repair_ocr_mojibake(text: str) -> str:
+
+    text = text.replace("#", "ż")
+
     text = MOJIBAKE_MID_PATTERN.sub(r"\1ż\2", text)
     text = MOJIBAKE_START_PATTERN.sub(r"ż\1", text)
     return ftfy.fix_text(text)

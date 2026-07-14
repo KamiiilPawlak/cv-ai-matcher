@@ -1,6 +1,4 @@
-import pytest
-
-from app.services.etl_cv_service.transformers.cleaninig import clean_ocr_text
+from app.services.etl_cv_service.transformers.cleaning import clean_ocr_text
 
 
 def test_clean_ocr_text_remoces_noise_and_keeps_email():
