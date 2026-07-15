@@ -77,7 +77,15 @@ warn_return_any = true
 warn_unused_configs = true
 
 [[tool.mypy.overrides]]
-module = ["magic", "pytesseract"]
+module = "magic.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "regex.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "pytesseract.*"
 ignore_missing_imports = true
 
 

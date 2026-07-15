@@ -23,7 +23,7 @@ repos:
     hooks:
       - id: mypy
         name: mypy
-        entry: bash -c "cd backend && ../.venv/bin/mypy ."
+        entry: backend\.venv\Scripts\mypy.exe backend
         language: system
         types: [python]
         pass_filenames: false
@@ -32,7 +32,7 @@ repos:
     hooks:
       - id: bandit
         name: bandit
-        entry: bash -c "cd backend && ../.venv/bin/bandit -r app/ -ll"
+        entry: powershell -Command "Set-Location backend; bandit -r app/ -ll"
         language: system
         types: [python]
         pass_filenames: false
