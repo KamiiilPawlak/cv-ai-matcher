@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from loguru import logger
 
 from app.api.v1.router import api_router
-from app.core.logger import setup_logging  # type: ignore
+from app.core.logger import setup_logging
 
 from .db.database import init_db
 

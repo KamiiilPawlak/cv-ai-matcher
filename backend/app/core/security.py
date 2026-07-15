@@ -1,4 +1,4 @@
-import magic  # type: ignore
+import magic
 from fastapi import HTTPException, status
 from loguru import logger
 

@@ -2,7 +2,7 @@
 import os
 import sys
 
-from loguru import logger  # type: ignore
+from loguru import logger
 
 
 def setup_logging() -> None:
