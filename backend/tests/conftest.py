@@ -1,3 +1,5 @@
+from typing import Generator
+
 import pytest
 from sqlmodel import Session, SQLModel, create_engine
 
@@ -10,7 +12,7 @@ engine = create_engine(settings.DATABASE_URL, echo=False)
 
 
 @pytest.fixture(scope="session", autouse=True)
-def setup_database():
+def setup_database() -> Generator[None, None, None]:
     from app.models.cv import DataLakeCV, ProcessedCV
 
     _ = [DataLakeCV, ProcessedCV]
@@ -22,7 +24,7 @@ def setup_database():
 
 
 @pytest.fixture(scope="function")
-def db_session():
+def db_session() -> Generator[Session, None, None]:
     connection = engine.connect()
 
     transaction = connection.begin()
@@ -35,12 +37,12 @@ def db_session():
 
 
 @pytest.fixture
-def file_service():
+def file_service() -> CVFileService:
     """Czysta instancja CVFileService do testow"""
     return CVFileService()
 
 
 @pytest.fixture
-def ocr_service():
+def ocr_service() -> OCRService:
     """ "Czysta instancja OCRService do testow"""
     return OCRService()
