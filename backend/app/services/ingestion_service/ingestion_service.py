@@ -27,7 +27,7 @@ class IngestionService:
         content: bytes,
         filename: str,
         content_type: str | None = None,
-    ) -> dict:
+    ) -> dict[str, str]:
         """Orkiestruje pełny potok wejściowy (Ingestion Pipeline) dla nowego pliku CV.
 
         Weryfikuje limit rozmiaru pliku, sprawdza integralność binarną (Magic Bytes),
