@@ -1,3 +1,4 @@
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -7,14 +8,14 @@ from app.services.ingestion_service.ingestion_service import IngestionService
 
 
 @pytest.fixture
-def mock_file_service():
+def mock_file_service() -> MagicMock:
     service = MagicMock()
     service.save_upload_file = AsyncMock(return_value="mocked_path/cv.pdf")
     return service
 
 
 @pytest.fixture
-def mock_ocr_service():
+def mock_ocr_service() -> MagicMock:
     service = MagicMock()
     service.process_document = AsyncMock(
         return_value="Sztucznie odczytany tekst z CV Kamila"
@@ -23,7 +24,9 @@ def mock_ocr_service():
 
 
 @pytest.fixture
-def ingestion_service(mock_file_service, mock_ocr_service):
+def ingestion_service(
+    mock_file_service: MagicMock, mock_ocr_service: MagicMock
+) -> IngestionService:
     return IngestionService(
         file_service=mock_file_service, ocr_service=mock_ocr_service
     )
@@ -31,8 +34,11 @@ def ingestion_service(mock_file_service, mock_ocr_service):
 
 @pytest.mark.asyncio
 async def test_process_cv_document_success(
-    ingestion_service, mock_file_service, mock_ocr_service, mocker
-):
+    ingestion_service: IngestionService,
+    mock_file_service: MagicMock,
+    mock_ocr_service: MagicMock,
+    mocker: Any,
+) -> None:
 
     fake_session = MagicMock()
     fake_content = b"Fake PDF binary content"
@@ -66,7 +72,9 @@ async def test_process_cv_document_success(
 
 
 @pytest.mark.asyncio
-async def test_process_cv_document_file_too_large(ingestion_service, mocker):
+async def test_process_cv_document_file_too_large(
+    ingestion_service: IngestionService, mocker: Any
+) -> None:
     fake_session = MagicMock()
     fake_filename = "potezny_plik.pdf"
 
@@ -81,7 +89,7 @@ async def test_process_cv_document_file_too_large(ingestion_service, mocker):
 
 
 @pytest.mark.asyncio
-async def test_delete_cv_document_not_found():
+async def test_delete_cv_document_not_found() -> None:
 
     fake_session = MagicMock()
 

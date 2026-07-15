@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 import pytest
 
@@ -6,7 +7,7 @@ from app.core.config import settings
 
 
 @pytest.mark.asyncio
-async def test_save_upload_file_success(file_service):
+async def test_save_upload_file_success(file_service: Any) -> None:
 
     fake_content = b"Sztuczna zawartosc plikow CV"
     fake_filename = "test_resume.pdf"

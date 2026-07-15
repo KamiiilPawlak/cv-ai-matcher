@@ -1,7 +1,9 @@
 from dataclasses import dataclass
+from datetime import datetime
+from typing import cast
 
-import dateparser  # type: ignore[import-untyped]
-import regex  # type: ignore[import-untyped]
+import dateparser
+import regex
 from loguru import logger
 
 
@@ -49,22 +51,22 @@ class CVTextNormalizer:
         return text
 
     def _normalize_language_levels(self, text: str) -> str:
-
-        return self._patterns.lang.sub(
+        result = self._patterns.lang.sub(
             lambda m: f"{m.group(1).upper()}{m.group(2)}", text
         )
+        return str(result)
 
     def _normalize_phone_numbers(self, text: str) -> str:
         def clean_phone(match: regex.Match) -> str:
 
-            return self._patterns.phone_clean.sub("", match.group(0))
+            return str(self._patterns.phone_clean.sub("", match.group(0)))
 
-        return self._patterns.phone.sub(clean_phone, text)
+        return cast(str, self._patterns.phone.sub(clean_phone, text))
 
     def _normalize_hyperlinks(self, text: str) -> str:
 
         text = self._patterns.hyperlink.sub(r"\2/", text)
-        return self._patterns.slash.sub("/", text)
+        return cast(str, self._patterns.slash.sub("/", text))
 
     def _normalize_dates(self, text: str) -> str:
         text = self._patterns.digits_date.sub(r"\2-\1", text)
@@ -74,9 +76,9 @@ class CVTextNormalizer:
             year = match.group(2)
 
             parsed_date = dateparser.parse(full_match, languages=["pl", "en"])
-            if parsed_date:
+            if isinstance(parsed_date, datetime):
                 return parsed_date.strftime("%Y-%m")
             return f"{year}-01"
 
         text = self._patterns.text_date.sub(replace_with_dateparser, text)
-        return self._patterns.present.sub("PRESENT", text)
+        return cast(str, self._patterns.present.sub("PRESENT", text))

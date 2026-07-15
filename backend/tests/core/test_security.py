@@ -1,4 +1,4 @@
-import pytest  # type: ignore
+import pytest
 from fastapi import HTTPException
 
 from app.core.config import settings
@@ -8,7 +8,7 @@ MOCK_PDF_BYTES = b"%PDF-1.4\n1 0 obj\n..."
 MOCK_TXT_BYTES = b"This is a text"
 
 
-def test_verify_file_integrity_succes():
+def test_verify_file_integrity_succes() -> None:
     """Testuje czy funkcja dziala"""
     if "application.pdf" not in settings.ALLOWED_MINE_TYPES:
         settings.ALLOWED_MINE_TYPES.append("application/pdf")
@@ -18,7 +18,7 @@ def test_verify_file_integrity_succes():
     assert wynik == "application/pdf"
 
 
-def test_verify_file_integrity_invalid_format():
+def test_verify_file_integrity_invalid_format() -> None:
     if "text/plain" in settings.ALLOWED_MINE_TYPES:
         settings.ALLOWED_MINE_TYPES.remove("text/plain")
 

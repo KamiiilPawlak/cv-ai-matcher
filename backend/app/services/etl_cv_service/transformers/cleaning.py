@@ -1,7 +1,8 @@
 import unicodedata
+from typing import cast
 
 import ftfy
-import regex  # type: ignore[import-untyped]
+import regex
 
 MOJIBAKE_MID_PATTERN = regex.compile(r"(\p{L})[^\p{L}\s'’`\-\.@+](\p{L})")
 MOJIBAKE_START_PATTERN = regex.compile(r"\b[^\p{L}\s'’`\-\.@+](\p{L})")
@@ -30,13 +31,13 @@ def _repair_ocr_mojibake(text: str) -> str:
 def _remove_graphic_noise(text: str) -> str:
     text = GRAPHIC_NOISE_PATTERN.sub(" ", text)
     text = CID_PATTERN.sub(" ", text)
-    return BULLET_PATTERN.sub(" ", text)
+    return cast(str, BULLET_PATTERN.sub(" ", text))
 
 
 def _normalize_whitespace(text: str) -> str:
     text = WHITESPACE_INLINE_PATTERN.sub(" ", text)
     text = "\n".join(line.strip() for line in text.splitlines())
-    return MULTILINE_REDUNDANT_NEWLINES.sub("\n\n", text)
+    return cast(str, MULTILINE_REDUNDANT_NEWLINES.sub("\n\n", text))
 
 
 def clean_ocr_text(raw_text: str) -> str:

@@ -1,17 +1,48 @@
-import pytest
+from typing import Generator
 
+import pytest
+from sqlmodel import Session, SQLModel, create_engine
+
+from app.core.config import settings
 from app.services import CVFileService, OCRService
 
 pytestmark = pytest.mark.asyncio
 
+engine = create_engine(settings.DATABASE_URL, echo=False)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_database() -> Generator[None, None, None]:
+    from app.models.cv import DataLakeCV, ProcessedCV
+
+    _ = [DataLakeCV, ProcessedCV]
+
+    SQLModel.metadata.create_all(engine)
+
+    yield
+    SQLModel.metadata.drop_all(engine)
+
+
+@pytest.fixture(scope="function")
+def db_session() -> Generator[Session, None, None]:
+    connection = engine.connect()
+
+    transaction = connection.begin()
+    session = Session(bind=connection, join_transaction_mode="create_savepoint")
+    yield session
+
+    session.close()
+    transaction.rollback()
+    connection.close()
+
 
 @pytest.fixture
-def file_service():
+def file_service() -> CVFileService:
     """Czysta instancja CVFileService do testow"""
     return CVFileService()
 
 
 @pytest.fixture
-def ocr_service():
+def ocr_service() -> OCRService:
     """ "Czysta instancja OCRService do testow"""
     return OCRService()

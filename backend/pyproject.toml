@@ -45,7 +45,8 @@ dev = [
     "pytest-asyncio",
     "pytest-mock",
     "radon",
-    "cohesion"
+    "cohesion",
+    "bandit"
 ]
 
 
@@ -76,7 +77,15 @@ warn_return_any = true
 warn_unused_configs = true
 
 [[tool.mypy.overrides]]
-module = ["magic", "pytesseract"]
+module = "magic.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "regex.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "pytesseract.*"
 ignore_missing_imports = true
 
 
@@ -109,5 +118,3 @@ exclude = "**/test_*.py|**/__pycache__/*"
 [tool.setuptools.packages.find]
 include = ["app"]
 exclude = ["uploads"]
-
-

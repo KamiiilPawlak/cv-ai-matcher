@@ -42,15 +42,19 @@ async def process_cv_upload(
         )
         logger.info(f"Plik {file.filename} zostal poprawnie przetworzony w Data Lake")
 
-        file_id = result.get("id") or result.get("file_id")
+        raw_file_id: UUID | str | None = result.get("id") or result.get("file_id")
 
-        if not file_id:
+        if not raw_file_id:
             logger.error(
                 "Nie udalo sie pobrac ID dokumentu z IngestionService. Przerywam automatyczny ETL."
             )
             raise HTTPException(
                 status_code=500, detail="Błąd identyfikacji zapisanego dokumentu."
             )
+
+        file_id: UUID = (
+            raw_file_id if isinstance(raw_file_id, UUID) else UUID(str(raw_file_id))
+        )
 
         logger.info(f"Automatyczne uruchamianie potoku ETL dla CV o ID: {file_id}")
 
@@ -72,7 +76,7 @@ async def process_cv_upload(
 
 
 @router.delete("/cv/{file_id}", status_code=204)
-async def delete_cv(file_id: str, session: Session = Depends(get_session)):
+async def delete_cv(file_id: str, session: Session = Depends(get_session)) -> None:
     logger.info(f"Zapytanie o usuniecie CV o ID: {file_id}")
     await IngestionService.delete_cv_document(session, file_id)
 
@@ -80,7 +84,9 @@ async def delete_cv(file_id: str, session: Session = Depends(get_session)):
 
 
 @router.get("/cv/{file_id}/compare")
-async def compare_cv_data(file_id: UUID, session: Session = Depends(get_session)):
+async def compare_cv_data(
+    file_id: UUID, session: Session = Depends(get_session)
+) -> Dict[str, Any]:
     logger.info(f"Rozpoczęto weryfikację danych po ETL dla CV o ID: {file_id}")
 
     db_raw = get_raw_cv(session, file_id)

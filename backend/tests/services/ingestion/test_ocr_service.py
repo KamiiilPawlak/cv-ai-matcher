@@ -2,16 +2,18 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from app.services.ingestion_service.ingestion_service import OCRService
+from app.services.ingestion_service.ocr_service import OCRService
 
 
 @pytest.fixture
-def ocr_service():
+def ocr_service() -> OCRService:
     return OCRService()
 
 
 @pytest.mark.asyncio
-async def test_process_document_digital_pdf_success(ocr_service, mocker):
+async def test_process_document_digital_pdf_success(
+    ocr_service: OCRService, mocker: MagicMock
+) -> None:
 
     fake_content = b"fake_pdf_bytes"
     fake_mime = "application/pdf"
@@ -42,7 +44,9 @@ async def test_process_document_digital_pdf_success(ocr_service, mocker):
 
 
 @pytest.mark.asyncio
-async def test_process_document_image_ocr_success(ocr_service, mocker):
+async def test_process_document_image_ocr_success(
+    ocr_service: OCRService, mocker: MagicMock
+) -> None:
 
     fake_content = b"fake_image_bytes"
     fake_mime = "image/png"
