@@ -45,7 +45,8 @@ dev = [
     "pytest-asyncio",
     "pytest-mock",
     "radon",
-    "cohesion"
+    "cohesion",
+    "bandit"
 ]
 
 
@@ -109,5 +110,3 @@ exclude = "**/test_*.py|**/__pycache__/*"
 [tool.setuptools.packages.find]
 include = ["app"]
 exclude = ["uploads"]
-
-
