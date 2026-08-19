@@ -1,0 +1,94 @@
+{
+  "languages": {
+    "Python": ["python", "python3", "python 3", "py"],
+    "JavaScript": ["javascript", "js", "ecmascript", "es6", "es2015+"],
+    "TypeScript": ["typescript", "ts"],
+    "Java": ["java", "java8", "java11", "java17", "java21"],
+    "C#": ["c#", "csharp", "c sharp", ".net c#"],
+    "C++": ["c++", "cpp"],
+    "C": ["c_language", "lang_c"],
+    "Go": ["golang", "go"],
+    "Rust": ["rust", "rustlang"],
+    "PHP": ["php", "php7", "php8"],
+    "Ruby": ["ruby"],
+    "Kotlin": ["kotlin", "kt"],
+    "Swift": ["swift"],
+    "SQL": ["sql", "structured query language"]
+  },
+  "backend_frameworks": {
+    "FastAPI": ["fastapi", "fast api", "fast-api"],
+    "Django": ["django", "django rest framework", "drf"],
+    "Flask": ["flask"],
+    "Node.js": ["node", "nodejs", "node.js", "node js"],
+    "Express.js": ["express", "expressjs", "express.js"],
+    "NestJS": ["nestjs", "nest.js", "nest js"],
+    "Spring Boot": ["spring", "springboot", "spring boot", "spring framework"],
+    "ASP.NET Core": [
+      "asp.net",
+      "dotnet core",
+      ".net core",
+      "asp.net core",
+      "dotnet"
+    ],
+    "Ruby on Rails": ["rails", "ror", "ruby on rails"],
+    "Laravel": ["laravel"]
+  },
+  "frontend_frameworks": {
+    "React": ["react", "react.js", "reactjs", "react js"],
+    "Next.js": ["next", "nextjs", "next.js", "next js"],
+    "Vue.js": ["vue", "vuejs", "vue.js", "vue 3"],
+    "Angular": ["angular", "angularjs", "angular.js", "angular 2+"],
+    "Svelte": ["svelte", "sveltekit"]
+  },
+  "databases": {
+    "PostgreSQL": ["postgres", "postgresql", "pg", "postgres db"],
+    "MySQL": ["mysql", "my-sql"],
+    "MongoDB": ["mongo", "mongodb"],
+    "Redis": ["redis"],
+    "Elasticsearch": ["elasticsearch", "elastic search", "es"],
+    "SQLite": ["sqlite", "sqlite3"],
+    "Oracle DB": ["oracle", "oracledb"],
+    "Microsoft SQL Server": ["mssql", "sql server", "ms sql"]
+  },
+  "ai_ml_data": {
+    "PyTorch": ["pytorch", "torch"],
+    "TensorFlow": ["tensorflow", "tf"],
+    "Scikit-Learn": ["scikit-learn", "sklearn", "scikit learn", "scikit"],
+    "Pandas": ["pandas"],
+    "NumPy": ["numpy"],
+    "Apache Spark": ["spark", "pyspark", "apache spark"],
+    "Databricks": ["databricks"],
+    "pgvector": ["pgvector", "pg_vector", "pg vector"],
+    "Qdrant": ["qdrant"],
+    "ChromaDB": ["chroma", "chromadb"],
+    "LangChain": ["langchain"],
+    "LlamaIndex": ["llamaindex", "llama-index"],
+    "Ollama": ["ollama"]
+  },
+  "devops_cloud": {
+    "Docker": ["docker", "docker-compose", "docker compose"],
+    "Kubernetes": ["k8s", "kubernetes", "kuber"],
+    "AWS": ["aws", "amazon web services"],
+    "Google Cloud Platform": ["gcp", "google cloud"],
+    "Microsoft Azure": ["azure"],
+    "Terraform": ["terraform"],
+    "Ansible": ["ansible"],
+    "CI/CD": [
+      "ci/cd",
+      "ci-cd",
+      "continuous integration",
+      "github actions",
+      "gitlab ci"
+    ]
+  },
+  "tools_and_architecture": {
+    "Git": ["git", "github", "gitlab", "bitbucket"],
+    "Celery": ["celery"],
+    "Apache Airflow": ["airflow", "apache airflow"],
+    "RabbitMQ": ["rabbitmq"],
+    "Apache Kafka": ["kafka"],
+    "REST API": ["rest", "rest api", "restful"],
+    "GraphQL": ["graphql"],
+    "gRPC": ["grpc"]
+  }
+}
