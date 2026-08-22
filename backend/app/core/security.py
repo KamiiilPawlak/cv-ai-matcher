@@ -15,10 +15,10 @@ def verify_file_integrity(content: bytes) -> str:
 
     mime_type = str(magic.from_buffer(content[:2024], mime=True))
 
-    if mime_type not in settings.ALLOWED_MINE_TYPES:
+    if mime_type not in settings.ALLOWED_MIME_TYPES:
         logger.error(
             f"Niieautoryzyowany format ppliku: {mime_type}"
-            f"Dozwolone typy: {settings.ALLOWED_MINE_TYPES}"
+            f"Dozwolone typy: {settings.ALLOWED_MIME_TYPES}"
         )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
