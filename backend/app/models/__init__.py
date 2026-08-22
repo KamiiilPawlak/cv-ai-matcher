@@ -1,4 +1,4 @@
-from .cv import DataLakeCV
-from .scraper import DataLakeScrapper
+from app.models.cv_document import CVDocumentLake
+from app.models.cv_raw_text import CVRawText
 
-__all__ = ["DataLakeCV", "DataLakeScrapper"]
+__all__ = ["CVDocumentLake", "CVRawText"]
