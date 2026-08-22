@@ -9,8 +9,28 @@ from loguru import logger
 
 @dataclass(frozen=True)
 class NormalizerPatterns:
+    dashes: regex.Pattern = regex.compile(
+        r"[\u2010\u2011\u2012\u2013\u2014\u2015\u2212]"
+    )
+    quotes: regex.Pattern = regex.compile(r"[„”\"«»]")
+    multiple_spaces: regex.Pattern = regex.compile(r"[ \t]+")
+
     text_date: regex.Pattern = regex.compile(
-        r"\b(\p{L}+)\s+(20\d{2}|19\d{2})\b", regex.IGNORECASE
+        r"\b(stycz(?:eń|nia)|lut(?:y|ego)|marz(?:ec|a)|kwiet(?:eń|nia)|maj(?:a)?|czerw(?:iec|ca)|lip(?:iec|ca)|sierp(?:ień|nia)|wrzes(?:ień|nia)|październik(?:a)?|listopad(?:a)?|grudzi(?:eń|nia)|january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)\s+(20\d{2}|19\d{2})\b",
+        regex.IGNORECASE,
+    )
+
+    digits_date_month_first: regex.Pattern = regex.compile(
+        r"\b(0[1-9]|1[0-2])[\./](20\d{2}|19\d{2})\b"
+    )
+    digits_date: regex.Pattern = digits_date_month_first
+    digits_date_year_first: regex.Pattern = regex.compile(
+        r"\b(20\d{2}|19\d{2})[\./](0[1-9]|1[0-2])\b"
+    )
+
+    present: regex.Pattern = regex.compile(
+        r"\b(obecnie|teraz|aktualnie|present|w tej chwili|do dziś|do teraz)\b",
+        regex.IGNORECASE,
     )
 
     lang: regex.Pattern = regex.compile(
@@ -26,14 +46,6 @@ class NormalizerPatterns:
         regex.IGNORECASE,
     )
 
-    digits_date: regex.Pattern = regex.compile(
-        r"(?<!\d[\./])\b(0[1-9]|1[0-2])[\./](20\d{2}|19\d{2})\b"
-    )
-    present: regex.Pattern = regex.compile(
-        r"\b(obecnie|teraz|aktualnie|present|w tej chwili|do dziś|do teraz)\b",
-        regex.IGNORECASE,
-    )
-
 
 class CVTextNormalizer:
     def __init__(self, patterns: NormalizerPatterns = NormalizerPatterns()) -> None:
@@ -44,12 +56,18 @@ class CVTextNormalizer:
             return ""
 
         logger.debug("[ETL - NORMALIZER] Uruchomienie etapów transformacji.")
-
+        text = self._normalize_punctuation(text)
         text = self._normalize_dates(text)
         text = self._normalize_phone_numbers(text)
         text = self._normalize_hyperlinks(text)
         text = self._normalize_language_levels(text)
+        text = self._patterns.multiple_spaces.sub(" ", text)
 
+        return text
+
+    def _normalize_punctuation(self, text: str) -> str:
+        text = self._patterns.dashes.sub("-", text)
+        text = self._patterns.quotes.sub('"', text)
         return text
 
     def _normalize_language_levels(self, text: str) -> str:
@@ -69,6 +87,7 @@ class CVTextNormalizer:
 
     def _normalize_dates(self, text: str) -> str:
         text = self._patterns.digits_date.sub(r"\2-\1", text)
+        text = self._patterns.digits_date_year_first.sub(r"\1-\2", text)
 
         def replace_with_dateparser(match: regex.Match) -> str:
             full_match = match.group(0)
