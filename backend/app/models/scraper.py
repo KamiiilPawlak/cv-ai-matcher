@@ -5,7 +5,7 @@ from sqlmodel import Field, SQLModel
 
 
 class DataLakeScrapper(SQLModel, table=True):
-    __tablename__ = "datalake_scraper"  # type: ignore
+    __tablename__ = "datalake_scraper"
 
     id: uuid.UUID = Field(
         default_factory=uuid.uuid4, primary_key=True, index=True, nullable=False
