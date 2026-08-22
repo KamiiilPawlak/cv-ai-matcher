@@ -122,7 +122,21 @@ Metoda ta realizuje trzy niezależne reguły transformacji tekstu, przetwarzają
 
 ---
 
-### 3. Heurestyka
+### 3. Ekstrakcja Heurystyczna (`heuristics.py`)
+
+Moduł ten zawiera bezstanowe, deterministyczne parsery oparte na zaawansowanych wyrażeniach regularnych (`regex`). W przeciwieństwie do normalizacji (która modyfikuje tekst w miejscu), ten krok służy do jawnego wyciągania kluczowych danych kontaktowych i metadanych z tekstu, zanim trafi on do sekcjonowania i modeli LLM.
+
+#### A. Ekstrakcja i normalizacja numerów telefonów (`extract_phone`)
+
+- **Wzorzec Regex:** `(\+\d{2}\s*)?\b(\d{3}-?\s?\d{3}-?\s?\d{3})\b`
+- **Działanie:** Identyfikuje polskie i międzynarodowe numery telefonów. Usunięcie kotwicy `\b` z samego początku pozwala na bezbłędne przechwytywanie znaku `+` w kodzie kraju (np. `+48`), zapobiegając ignorowaniu grupy kierunkowej.
+- **Transformacja:** Łączy dopasowane grupy i przepuszcza wynik przez funkcję czyszczącą `regex.sub(r"[\-\s]+", "", full_phone)`. Ucieczka myślnika (`\-`) gwarantuje, że usuwane są wyłącznie spacji i myślniki, a znak `+` na początku pozostaje nienaruszony, zwracając standard E.164.
+
+#### B. Ekstrakcja adresów e-mail (`extract_email`)
+
+- **Działanie:** _(Tutaj dopiszemy logikę, jak już ustalimy strukturę segmentów `[local-part]@[domain-part]` i obsłużymy błędy OCR z kropkami/przecinkami)_.
+
+---
 
 ### 4. Heurestyka Section Splitting
 

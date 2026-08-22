@@ -1,9 +1,11 @@
 import asyncio
 import io
+import json
 from dataclasses import dataclass
+from typing import Any, Dict, Union
 
 import pdfplumber
-import pytesseract  # type: ignore
+import pytesseract
 from loguru import logger
 from pdf2image import convert_from_bytes
 from PIL import Image, ImageFilter, ImageOps
@@ -19,8 +21,24 @@ class OCRConfig:
 
 
 class OCRService:
-    def __init__(self, config: OCRConfig = OCRConfig()) -> None:
-        self._config = config
+    def __init__(
+        self, config: Union[OCRConfig, Dict[str, Any], str, None] = None
+    ) -> None:
+        if isinstance(config, str):
+            try:
+                config_dict = json.loads(config)
+                self._config = OCRConfig(**config_dict)
+            except Exception as e:
+                logger.warning(
+                    f"Nie udałosię sparsować ciągu JSON config, używam domyślnej konfiguracji: {e}"
+                )
+                self._config = OCRConfig()
+        elif isinstance(config, dict):
+            self._config = OCRConfig(**config)
+        elif isinstance(config, OCRConfig):
+            self._config = config
+        else:
+            self._config = OCRConfig()
 
     async def process_document(self, content: bytes, mime_type: str) -> str:
         """Ekstrahuje tekst z dokumentu, stosując hybrydową strategię (PDF / OCR).
@@ -84,7 +102,6 @@ class OCRService:
         return "\n".join(results)
 
     def _apply_pil_filters(self, img: Image.Image) -> Image.Image:
-
         img = img.convert("L")
         img = ImageOps.autocontrast(img)
         if self._config.apply_sharpen:

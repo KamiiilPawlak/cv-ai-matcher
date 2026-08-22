@@ -1,31 +1,45 @@
-from calendar import monthrange
 from datetime import date
-from typing import Tuple
 
+from app.services.etl_cv_service.heuristic.domain.experience_calc import (
+    convert_extracted_range_to_dates,
+    merge_overlapping_ranges,
+)
 from app.services.etl_cv_service.heuristic.domain.models import (
     DateRange,
+    ExperienceMetrics,
 )
 
 
-def convert_extracted_range_to_dates(extracted: DateRange) -> Tuple[date, date] | None:
-    if not extracted.start_date:
-        return None
+class ExperienceService:
+    def calculate_experience(self, raw_ranges: list[DateRange]) -> ExperienceMetrics:
+        valid_ranges: list[tuple[date, date]] = []
+        for range_item in raw_ranges:
+            converted = convert_extracted_range_to_dates(range_item)
+            if converted:
+                valid_ranges.append(converted)
 
-    start_dt = (
-        extracted.start_date
-        if isinstance(extracted.start_date, date)
-        else date.fromisoformat(extracted.start_date)
-    )
+        if not valid_ranges:
+            return ExperienceMetrics(
+                total_days=0,
+                total_months=0,
+                total_years=0.0,
+                min_date=None,
+                max_date=None,
+            )
 
-    if getattr(extracted, "is_current", False) or not extracted.end_date:
-        end_dt = date.today()
-    else:
-        temp_end = (
-            extracted.end_date
-            if isinstance(extracted.end_date, date)
-            else date.fromisoformat(extracted.end_date)
+        merged = merge_overlapping_ranges(valid_ranges)
+
+        total_days = sum((end - start).days + 1 for start, end in merged)
+        total_months = round(total_days / 30.4375)
+        total_years = round(total_days / 365.25, 1)
+
+        min_date = min(start for start, _ in merged)
+        max_date = max(end for _, end in merged)
+
+        return ExperienceMetrics(
+            total_days=total_days,
+            total_months=total_months,
+            total_years=total_years,
+            min_date=min_date,
+            max_date=max_date,
         )
-        last_day = monthrange(temp_end.year, temp_end.month)[1]
-        end_dt = date(temp_end.year, temp_end.month, last_day)
-
-    return (start_dt, end_dt)

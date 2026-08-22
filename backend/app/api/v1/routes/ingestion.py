@@ -9,14 +9,9 @@ from app.crud.datalake_cv import get_raw_cv
 from app.db.database import get_session
 from app.models.cv import ProcessedCV
 from app.schema.ingestion_dto import IngestionResponse
-from app.services.etl_cv_service.pipeline import CvEtlPipeline
 from app.services.ingestion_service.ingestion_service import IngestionService
 
 router = APIRouter()
-
-
-def get_cv_etl_pipeline() -> CvEtlPipeline:
-    return CvEtlPipeline()
 
 
 @router.post("/upload", response_model=IngestionResponse)

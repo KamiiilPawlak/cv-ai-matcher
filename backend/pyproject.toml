@@ -23,7 +23,11 @@ dependencies = [
     "pdf2image",
     "psycopg2-binary",
     "ftfy",
-    "regex"
+    "regex",
+    "phonenumbers",
+    "dateparser",
+    "flashtext",
+    "httpx",
 ]
 
 [project.optional-dependencies]

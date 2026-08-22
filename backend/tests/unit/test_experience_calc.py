@@ -1,40 +1,114 @@
 from datetime import date
 
 from app.services.etl_cv_service.heuristic.domain.experience_calc import (
-    calculate_experience_metrics,
-    merge_overlapping_intervals,
+    convert_extracted_range_to_dates,
+    merge_overlapping_ranges,
 )
 from app.services.etl_cv_service.heuristic.domain.models import DateRange
 
 
-def test_merge_overlapping_intervals() -> None:
-    intervals = [
-        DateRange(start_date=date(2020, 1, 1), end_date=date(2022, 1, 1)),
-        DateRange(start_date=date(2021, 1, 1), end_date=date(2023, 1, 1)),
+def test_convert_range_valid_dates() -> None:
+    """Test prawidłowej konwersji ze stałymi datami (koniec miesiąca rozciągnięty)."""
+    item = DateRange(start_date=date(2021, 5, 10), end_date=date(2022, 2, 1))
+
+    result = convert_extracted_range_to_dates(item)
+
+    assert result == (date(2021, 5, 10), date(2022, 2, 28))
+
+
+def test_convert_range_leap_year() -> None:
+
+    item = DateRange(start_date=date(2024, 1, 1), end_date=date(2024, 2, 10))
+
+    result = convert_extracted_range_to_dates(item)
+
+    assert result == (date(2024, 1, 1), date(2024, 2, 29))
+
+
+def test_convert_range_is_current() -> None:
+
+    item = DateRange(start_date=date(2023, 1, 1), is_current=True)
+
+    result = convert_extracted_range_to_dates(item)
+
+    assert result == (date(2023, 1, 1), date.today())
+
+
+def test_convert_range_missing_start_date() -> None:
+
+    item = DateRange(start_date=None, end_date=date(2022, 5, 1))
+
+    assert convert_extracted_range_to_dates(item) is None
+
+
+def test_convert_range_start_after_end() -> None:
+
+    item = DateRange(start_date=date(2023, 1, 1), end_date=date(2020, 1, 1))
+
+    assert convert_extracted_range_to_dates(item) is None
+
+
+# ============================================================================
+# Testy dla: merge_overlapping_ranges
+# ============================================================================
+
+
+def test_merge_ranges_empty_list() -> None:
+
+    assert merge_overlapping_ranges([]) == []
+
+
+def test_merge_ranges_no_overlap() -> None:
+
+    ranges = [
+        (date(2018, 1, 1), date(2019, 12, 31)),
+        (date(2021, 1, 1), date(2022, 12, 31)),
     ]
-    merged = merge_overlapping_intervals(intervals)
+
+    merged = merge_overlapping_ranges(ranges)
+
+    assert len(merged) == 2
+    assert merged == ranges
+
+
+def test_merge_ranges_partial_overlap() -> None:
+
+    ranges = [
+        (date(2020, 1, 1), date(2021, 6, 30)),
+        (date(2021, 1, 1), date(2022, 5, 31)),
+    ]
+
+    merged = merge_overlapping_ranges(ranges)
 
     assert len(merged) == 1
-    assert merged[0].start_date == date(2020, 1, 1)
-    assert merged[0].end_date == date(2023, 1, 1)
+    assert merged == [(date(2020, 1, 1), date(2022, 5, 31))]
 
 
-def test_calculate_experience_metrics_with_overlap() -> None:
-    raw_intervals = [
-        (date(2020, 1, 1), date(2022, 1, 1)),
-        (date(2021, 1, 1), date(2023, 1, 1)),
+def test_merge_ranges_completely_enclosed() -> None:
+
+    ranges = [
+        (date(2020, 1, 1), date(2023, 12, 31)),
+        (date(2021, 3, 1), date(2021, 9, 30)),
     ]
 
-    metrics = calculate_experience_metrics(raw_intervals)
+    merged = merge_overlapping_ranges(ranges)
 
-    assert metrics.job_count == 2
-    assert metrics.min_date == date(2020, 1, 1)
-    assert metrics.max_date == date(2023, 1, 1)
-    assert metrics.total_years == 3.0
+    assert len(merged) == 1
+    assert merged == [(date(2020, 1, 1), date(2023, 12, 31))]
 
 
-def test_calculate_experience_metrics_empty() -> None:
-    metrics = calculate_experience_metrics([])
-    assert metrics.job_count == 0
-    assert metrics.total_days == 0
-    assert metrics.min_date is None
+def test_merge_ranges_unsorted_input() -> None:
+
+    ranges = [
+        (date(2022, 1, 1), date(2023, 1, 1)),
+        (date(2019, 1, 1), date(2020, 6, 1)),
+        (date(2020, 1, 1), date(2021, 1, 1)),
+    ]
+
+    merged = merge_overlapping_ranges(ranges)
+
+    assert len(merged) == 2
+    assert merged == [
+        (date(2019, 1, 1), date(2021, 1, 1)),
+        (date(2022, 1, 1), date(2023, 1, 1)),
+    ]

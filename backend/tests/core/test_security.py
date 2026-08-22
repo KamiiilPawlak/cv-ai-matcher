@@ -10,8 +10,8 @@ MOCK_TXT_BYTES = b"This is a text"
 
 def test_verify_file_integrity_succes() -> None:
     """Testuje czy funkcja dziala"""
-    if "application.pdf" not in settings.ALLOWED_MINE_TYPES:
-        settings.ALLOWED_MINE_TYPES.append("application/pdf")
+    if "application.pdf" not in settings.ALLOWED_MIME_TYPES:
+        settings.ALLOWED_MIME_TYPES.append("application/pdf")
 
     wynik = verify_file_integrity(MOCK_PDF_BYTES)
 
@@ -19,8 +19,8 @@ def test_verify_file_integrity_succes() -> None:
 
 
 def test_verify_file_integrity_invalid_format() -> None:
-    if "text/plain" in settings.ALLOWED_MINE_TYPES:
-        settings.ALLOWED_MINE_TYPES.remove("text/plain")
+    if "text/plain" in settings.ALLOWED_MIME_TYPES:
+        settings.ALLOWED_MIME_TYPES.remove("text/plain")
 
     with pytest.raises(HTTPException) as info_o_bledzie:
         verify_file_integrity(MOCK_TXT_BYTES)

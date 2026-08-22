@@ -1,58 +1,62 @@
-from dataclasses import dataclass
-from typing import Optional
+from datetime import date
+from typing import Dict, List, Optional, Union, cast
 
 import dateparser
-import regex
+import regex as re
 
 
-@dataclass
-class DateRange:
-    start_date: Optional[str]
-    end_date: Optional[str]
-    is_current: bool
+def _parse_single_date(date_str: str) -> Optional[Union[date, str]]:
+    cleaned = date_str.strip().lower()
+
+    if re.match(r"^(obecnie|present|now|aktualnie)$", cleaned):
+        return "present"
+
+    if re.fullmatch(r"\d{4}", cleaned):
+        return date(int(cleaned), 1, 1)
+
+    match_my = re.fullmatch(r"(\d{1,2})[\./](\d{4})", cleaned)
+    if match_my:
+        month, year = map(int, match_my.groups())
+        return date(year, month, 1)
+
+    settings = {
+        "PREFER_DAY_OF_MONTH": "first",
+        "PREFER_DATES_FROM": "past",
+        "DATE_ORDER": "DMY",
+        "REQUIRE_PARTS": ["year"],
+    }
+
+    parsed = dateparser.parse(date_str, settings=settings)
+    if parsed is not None:
+        return cast(date, parsed.date())
+
+    return None
 
 
-RANGE_PATTERN = regex.compile(
-    r"((?:(?:0[1-9]|1[0-2])[./-])?(?:19|20)\d{2})\s*(?:-|–|—|do|to)\s*((?:(?:0[1-9]|1[0-2])[./-])?(?:19|20)\d{2}|obecnie|present|nadal|now)",
-    regex.IGNORECASE,
-)
-
-
-CURRENT_KEYWORDS = {"obecnie", "present", "nadal", "now", "dzisiaj"}
-
-
-def _parse_single_date(date_str: str) -> Optional[str]:
-    if regex.fullmatch(r"(19|20)\d{2}", date_str):
-        return f"{date_str}-01-01"
-
-    parsed = dateparser.parse(
-        date_str,
-        languages=["pl", "en"],
-        settings={"PREFER_DAY_OF_MONTH": "first"},
+def extract_date_ranges(text: str) -> List[Dict[str, Optional[Union[date, bool, str]]]]:
+    date_range_pattern = re.compile(
+        r"((?:\d{1,2}[\./])?(?:\d{1,2}[\./])?\d{4})\s*(?:-|–|—|do|to)\s*((?:\d{1,2}[\./])?(?:\d{1,2}[\./])?\d{4}|obecnie|present|aktualnie|now)",
+        re.IGNORECASE,
     )
 
-    return parsed.strftime("%Y-%m-%d") if parsed else None
+    results: List[Dict[str, Optional[Union[date, bool, str]]]] = []
 
+    for match in date_range_pattern.finditer(text):
+        start_raw, end_raw = match.groups()
 
-def extract_date_ranges(text: Optional[str]) -> list[DateRange]:
-    """Wyciąga zakresy dat pracy/edukacji z surowego tekstu."""
-    if not text or not text.strip():
-        return []
+        start_date = _parse_single_date(start_raw)
+        end_raw_parsed = _parse_single_date(end_raw)
 
-    results: list[DateRange] = []
-    matches = RANGE_PATTERN.findall(text)
+        if isinstance(start_date, date):
+            is_current = end_raw_parsed == "present"
+            end_date = None if is_current else cast(Optional[date], end_raw_parsed)
 
-    for start_raw, end_raw in matches:
-        end_clean = end_raw.strip().lower()
-        is_current = end_clean in CURRENT_KEYWORDS
-
-        start_parsed = _parse_single_date(start_raw.strip())
-        end_parsed = None if is_current else _parse_single_date(end_clean)
-
-        results.append(
-            DateRange(
-                start_date=start_parsed, end_date=end_parsed, is_current=is_current
+            results.append(
+                {
+                    "start_date": start_date,
+                    "end_date": end_date,
+                    "is_current": is_current,
+                }
             )
-        )
 
     return results
