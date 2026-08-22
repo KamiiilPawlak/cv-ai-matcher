@@ -24,9 +24,3 @@ class ExperienceMetrics(BaseModel):
     max_date: Optional[date] = Field(
         None, description="Data zakończenia ostatniej pracy"
     )
-    mean_job_duration_months: float = Field(
-        ..., description="Średnia długość zatrudnienia w jednym miejscu w miesiącach"
-    )
-    job_count: int = Field(
-        ..., description="Łączna liczba zarejestrowanych miejsc pracy"
-    )

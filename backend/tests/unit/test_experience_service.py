@@ -1,45 +1,91 @@
 from datetime import date
-from typing import cast
+
+import pytest
 
 from app.services.etl_cv_service.heuristic.domain.experience_service import (
-    convert_extracted_range_to_dates,
+    ExperienceService,
 )
 from app.services.etl_cv_service.heuristic.domain.models import (
-    DateRange as ExtractedDateRange,
+    DateRange,
+    ExperienceMetrics,
 )
 
 
-def test_convert_standard_past_date_range() -> None:
-    """Sprawdza konwersję zakończonego okresu pracy (ustawienie ostatniego dnia miesiąca)."""
-    extracted = ExtractedDateRange(
-        start_date=date(2020, 1, 1), end_date=date(2022, 5, 1)
-    )
-
-    result = convert_extracted_range_to_dates(extracted)
-
-    assert result is not None
-    assert result[0] == date(2020, 1, 1)
-
-    assert result[1] == date(2022, 5, 31)
+@pytest.fixture
+def service() -> ExperienceService:
+    return ExperienceService()
 
 
-def test_convert_current_job_range() -> None:
-    """Sprawdza, czy praca z is_current=True dostaje jako end_date dzisiejszą datę."""
-    extracted = ExtractedDateRange(
-        start_date=date(2023, 3, 1), end_date=cast(date, None)
-    )
+def test_calculate_experience_empty_list(service: ExperienceService) -> None:
+    """Test zachowania dla pustej listy wejściowej."""
+    result: ExperienceMetrics = service.calculate_experience([])
 
-    result = convert_extracted_range_to_dates(extracted)
-
-    assert result is not None
-    assert result[0] == date(2023, 3, 1)
-    assert result[1] == date.today()
+    assert result.total_days == 0
+    assert result.total_months == 0
+    assert result.total_years == 0.0
+    assert result.min_date is None
+    assert result.max_date is None
 
 
-def test_convert_invalid_range_missing_start() -> None:
-    """Sprawdza zachowanie dla błędnych/pustych obiektów."""
-    extracted = ExtractedDateRange(
-        start_date=cast(date, None), end_date=date(2022, 1, 1)
-    )
+def test_calculate_experience_single_job(service: ExperienceService) -> None:
+    """Test pojedynczego okresu zatrudnienia (np. równy 1 rok)."""
+    ranges = [DateRange(start_date=date(2022, 1, 1), end_date=date(2022, 12, 31))]
 
-    assert convert_extracted_range_to_dates(extracted) is None
+    result: ExperienceMetrics = service.calculate_experience(ranges)
+
+    assert result.total_days == 365
+    assert result.total_months == 12
+    assert result.total_years == 1.0
+    assert result.min_date == date(2022, 1, 1)
+    assert result.max_date == date(2022, 12, 31)
+
+
+def test_calculate_experience_overlapping_dates(service: ExperienceService) -> None:
+    """
+    Test nakładających się okresów pracy (dwie prace w tym samym czasie):
+    - Praca A: 2020-01-01 do 2021-06-30
+    - Praca B: 2021-01-01 do 2021-12-31
+    Łącznie powina wyjść ciągła praca od 2020-01-01 do 2021-12-31 (2 lata = 731 dni).
+    """
+    ranges = [
+        DateRange(
+            start_date=date(2020, 1, 1), end_date=date(2021, 6, 1)
+        ),  # czerwiec rozciągnięty do 2021-06-30
+        DateRange(
+            start_date=date(2021, 1, 1), end_date=date(2021, 12, 1)
+        ),  # grudzień rozciągnięty do 2021-12-31
+    ]
+
+    result: ExperienceMetrics = service.calculate_experience(ranges)
+
+    assert result.min_date == date(2020, 1, 1)
+    assert result.max_date == date(2021, 12, 31)
+    assert result.total_years == 2.0
+
+
+def test_calculate_experience_is_current(service: ExperienceService) -> None:
+    """Test dla pracy trwającej nadal (is_current=True)."""
+    ranges = [DateRange(start_date=date.today(), is_current=True)]
+
+    result: ExperienceMetrics = service.calculate_experience(ranges)
+
+    assert result.min_date == date.today()
+    assert result.max_date == date.today()
+    assert result.total_days == 1
+
+
+def test_calculate_experience_invalid_dates_filtered_out(
+    service: ExperienceService,
+) -> None:
+    """Test ignorowania wpisów z błędnymi datami (start_date > end_date lub brak start_date)."""
+    ranges = [
+        DateRange(start_date=None, end_date=date(2022, 1, 1)),
+        DateRange(
+            start_date=date(2023, 1, 1), end_date=date(2020, 1, 1)
+        ),  # Odwrotne daty
+    ]
+
+    result: ExperienceMetrics = service.calculate_experience(ranges)
+
+    assert result.total_days == 0
+    assert result.min_date is None
