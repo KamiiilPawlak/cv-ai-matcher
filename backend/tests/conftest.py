@@ -1,10 +1,10 @@
 from typing import Generator
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from sqlmodel import Session, SQLModel, create_engine
 
 from app.core.config import settings
-from app.services import CVFileService, OCRService
 
 pytestmark = pytest.mark.asyncio
 
@@ -13,12 +13,12 @@ engine = create_engine(settings.DATABASE_URL, echo=False)
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_database() -> Generator[None, None, None]:
-    from app.models.cv import DataLakeCV, ProcessedCV
+    from app.models.cv_document import CVDocumentLake
+    from app.models.cv_raw_text import CVRawText
 
-    _ = [DataLakeCV, ProcessedCV]
+    _ = [CVDocumentLake, CVRawText]
 
     SQLModel.metadata.create_all(engine)
-
     yield
     SQLModel.metadata.drop_all(engine)
 
@@ -26,9 +26,9 @@ def setup_database() -> Generator[None, None, None]:
 @pytest.fixture(scope="function")
 def db_session() -> Generator[Session, None, None]:
     connection = engine.connect()
-
     transaction = connection.begin()
     session = Session(bind=connection, join_transaction_mode="create_savepoint")
+
     yield session
 
     session.close()
@@ -37,12 +37,16 @@ def db_session() -> Generator[Session, None, None]:
 
 
 @pytest.fixture
-def file_service() -> CVFileService:
-    """Czysta instancja CVFileService do testow"""
-    return CVFileService()
+def mock_file_service() -> MagicMock:
+    service = MagicMock()
+    service.save_upload_file = AsyncMock(return_value="mocked_path/cv.pdf")
+    return service
 
 
 @pytest.fixture
-def ocr_service() -> OCRService:
-    """ "Czysta instancja OCRService do testow"""
-    return OCRService()
+def mock_ocr_service() -> MagicMock:
+    service = MagicMock()
+    service.process_document = AsyncMock(
+        return_value="Sztucznie odczytany tekst z CV Kamila"
+    )
+    return service

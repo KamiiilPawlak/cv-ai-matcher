@@ -1,7 +1,6 @@
 import asyncio
 import io
 import json
-from dataclasses import dataclass
 from typing import Any, Dict, Union
 
 import pdfplumber
@@ -10,14 +9,7 @@ from loguru import logger
 from pdf2image import convert_from_bytes
 from PIL import Image, ImageFilter, ImageOps
 
-
-@dataclass(frozen=True)
-class OCRConfig:
-    """Niezmienna konfiguracja parametrów dla OCRService."""
-
-    min_text_length: int = 100
-    tesseract_lang: str = "pol+eng"
-    apply_sharpen: bool = True
+from app.core.config import OCRConfig
 
 
 class OCRService:
@@ -41,23 +33,11 @@ class OCRService:
             self._config = OCRConfig()
 
     async def process_document(self, content: bytes, mime_type: str) -> str:
-        """Ekstrahuje tekst z dokumentu, stosując hybrydową strategię (PDF / OCR).
 
-        Najpierw próbuje pobrać tekst cyfrowy z PDF. Jeśli plik go nie posiada,
-        jest obrazem lub tekst ma poniżej 100 znaków, uruchamia proces OCR.
-        Operacja OCR jest delegowana do osobnego wątku (CPU-bound).
-
-        Args:
-            content (bytes): Surowa zawartość pliku w bajtach.
-            mime_type (str): Typ MIME pliku (np. "application/pdf").
-
-        Returns:
-            str: Wyekstrahowany tekst przygotowany do potoku ETL.
-        """
         if mime_type == "application/pdf":
             text = self._extract_digital_text(content)
             logger.info("Proba ekstrakcji tekstu cyfrowego z pliku PDF")
-            if text.strip() and len(text) > self._config.min_text_length:
+            if text.strip() and len(text) > self._config.MIN_TEXT_LENGTH:
                 logger.info("Pomyślnie wyekstrahowano tekst cyfrowy z PDF.")
                 return text
         logger.info(f"Uruchamianie procesu OCR dla typu: {mime_type}")
@@ -73,7 +53,7 @@ class OCRService:
                         full_text.append(page_text)
 
                     current_length = len("\n".join(full_text).strip())
-                    if current_length > self._config.min_text_length:
+                    if current_length > self._config.MIN_TEXT_LENGTH:
                         logger.info(
                             "Przekroczono minimalny próg tekstu cyfrowego, przerywam czytanie PDF."
                         )
@@ -95,7 +75,7 @@ class OCRService:
         for img in images:
             processed = self._apply_pil_filters(img)
             text = pytesseract.image_to_string(
-                processed, lang=self._config.tesseract_lang
+                processed, lang=self._config.TESSERACT_LANG
             )
             results.append(text)
 
@@ -104,7 +84,7 @@ class OCRService:
     def _apply_pil_filters(self, img: Image.Image) -> Image.Image:
         img = img.convert("L")
         img = ImageOps.autocontrast(img)
-        if self._config.apply_sharpen:
+        if self._config.APPLY_SHARPEN:
             img = img.filter(ImageFilter.SHARPEN)
 
         return img
