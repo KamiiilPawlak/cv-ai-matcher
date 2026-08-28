@@ -4,6 +4,9 @@ from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+BASE_DIR = Path(__file__).resolve().parents[3]
+STORAGE_DIR = BASE_DIR / "storage" / "cv_uploads"
+
 
 @dataclass(frozen=True)
 class OCRConfig:
@@ -14,9 +17,6 @@ class OCRConfig:
 
 
 class Settings(BaseSettings):
-    BASE_DIR: Path = Path(__file__).parent.parent.parent
-    UPLOAD_DIR: Path = BASE_DIR / "uploads"
-
     # file and security
     MAX_FILE_SIZE: int = 5 * 1024 * 1024
     ALLOWED_MIME_TYPES: list[str] = ["application/pdf", "image/png", "image/jpeg"]

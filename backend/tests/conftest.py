@@ -1,10 +1,23 @@
+import os
 from typing import Generator
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 
+os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
+
 from app.core.config import settings
+from app.main import app
+
+
+@pytest.fixture
+def client() -> Generator[TestClient, None, None]:
+
+    with TestClient(app) as c:
+        yield c
+
 
 pytestmark = pytest.mark.asyncio
 
