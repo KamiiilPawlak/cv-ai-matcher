@@ -3,15 +3,16 @@ from typing import Generator
 from loguru import logger
 from sqlmodel import Session, SQLModel, create_engine
 
-from ..core.config import settings
-from ..models.cv import DataLakeCV, ProcessedCV
+from app.core.config import settings
+from app.models.cv_document import CVDocumentLake
+from app.models.cv_raw_text import CVRawText
 
 engine = create_engine(settings.DATABASE_URL, echo=True)
 
 
 def init_db() -> None:
     logger.info("Inicjalizacja bazy danych")
-    _ = [DataLakeCV, ProcessedCV]
+    _ = [CVDocumentLake, CVRawText]
     logger.success("Tabela bazy danych zostala pomyslnie utworzona")
     SQLModel.metadata.create_all(engine)
 
