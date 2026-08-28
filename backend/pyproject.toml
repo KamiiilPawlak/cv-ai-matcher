@@ -5,6 +5,8 @@ description = "AI powered CV matching system using LLMs"
 requires-python = ">=3.11"
 
 dependencies = [
+
+    # Web Framework & Core
     "fastapi",
     "uvicorn",
     "pydantic",
@@ -48,6 +50,7 @@ dev = [
     "pytest-dotenv",
     "pytest-asyncio",
     "pytest-mock",
+    "freezegun",
     "radon",
     "cohesion",
     "bandit"

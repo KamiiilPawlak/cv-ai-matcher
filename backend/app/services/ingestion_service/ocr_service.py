@@ -1,7 +1,5 @@
 import asyncio
 import io
-import json
-from typing import Any, Dict, Union
 
 import pdfplumber
 import pytesseract
@@ -13,24 +11,8 @@ from app.core.config import OCRConfig
 
 
 class OCRService:
-    def __init__(
-        self, config: Union[OCRConfig, Dict[str, Any], str, None] = None
-    ) -> None:
-        if isinstance(config, str):
-            try:
-                config_dict = json.loads(config)
-                self._config = OCRConfig(**config_dict)
-            except Exception as e:
-                logger.warning(
-                    f"Nie udałosię sparsować ciągu JSON config, używam domyślnej konfiguracji: {e}"
-                )
-                self._config = OCRConfig()
-        elif isinstance(config, dict):
-            self._config = OCRConfig(**config)
-        elif isinstance(config, OCRConfig):
-            self._config = config
-        else:
-            self._config = OCRConfig()
+    def __init__(self) -> None:
+        self._config = OCRConfig()
 
     async def process_document(self, content: bytes, mime_type: str) -> str:
 
